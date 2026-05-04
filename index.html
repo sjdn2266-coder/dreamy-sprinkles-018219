@@ -206,7 +206,7 @@
 </div>
 
 <script>
-const prompts = {
+const DB = {
   sentences:[
     {text:"She sells seashells by the seashore.",phonetic:"/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/",sub:"Focus on 'sh' /ʃ/ vs 's' /s/. Keep tongue close to roof of mouth for 'sh'."},
     {text:"The weather in Edinburgh is rather unpredictable.",phonetic:"/ðə ˈwɛðər ɪn ˈɛdɪnbrə ɪz ˈrɑːðər ʌnprɪˈdɪktəbl/",sub:"Practice the 'th' /ð/ sound — tongue lightly touching upper teeth."},
@@ -234,6 +234,7 @@ const prompts = {
 let currentMode='sentences';
 let currentIndex=0;
 let progress={sentences:0,tongue:0,vocab:0,free:0};
+let currentDiff='all';
 try{const s=localStorage.getItem('sf_progress');if(s)progress=JSON.parse(s);}catch(e){}
 let recognition=null;
 let isRecording=false;
