@@ -243,6 +243,7 @@ let currentIndex=0;
 let progress={sentences:0,tongue:0,vocab:0,free:0};
 let currentDiff='all';
 try{const s=localStorage.getItem('sf_progress');if(s)progress=JSON.parse(s);}catch(e){}
+try{['sentences','tongue','vocab','free'].forEach(m=>{const saved=localStorage.getItem('sf_db_'+m);if(saved){const p=JSON.parse(saved);if(Array.isArray(p)&&p.length>0)DB[m]=p;}});}catch(e){}
 let recognition=null;
 let isRecording=false;
 let transcript='';
@@ -275,26 +276,7 @@ function getFilteredPrompts(){
   return arr.filter(p=>p.level===currentDiff);
 }
 
-function loadNextPrompt(){
-  const arr=getFilteredPrompts();
-  const total=arr.length;
-  currentIndex++;
-
-  if(currentIndex>=total){
-    // 进度到头，AI生成新一批例句替换本地库，进度清零
-    currentIndex=0;
-    progress[currentMode]=0;
-    saveProgress();
-    resetRecording();
-    replenishFromAI(total);
-  } else {
-    progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
-    saveProgress();
-    resetRecording();
-    generateAIPrompt();
-  }
-}
- async function replenishFromAI(count){
+async function replenishFromAI(count){
   document.getElementById('promptText').textContent='Generating new batch...';
   document.getElementById('promptPhonetic').textContent='';
   document.getElementById('promptSub').textContent='';
@@ -327,15 +309,13 @@ Return ONLY a valid JSON array, nothing else, no markdown:
     const raw=data.content?.[0]?.text||'[]';
     const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
     if(Array.isArray(parsed)&&parsed.length>0){
-  DB[currentMode]=parsed;
-  try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
-  loadPrompt(0);
-}
+      DB[currentMode]=parsed;
+      try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
+      loadPrompt(0);
     } else {
       generateAIPrompt();
     }
   }catch(e){
-    // 失败就直接AI生成单句
     generateAIPrompt();
   }
   updateProgressBar();
