@@ -327,9 +327,10 @@ Return ONLY a valid JSON array, nothing else, no markdown:
     const raw=data.content?.[0]?.text||'[]';
     const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
     if(Array.isArray(parsed)&&parsed.length>0){
-      // 替换本地例句库中当前模式的数据
-      DB[currentMode]=parsed;
-      loadPrompt(0);
+  DB[currentMode]=parsed;
+  try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
+  loadPrompt(0);
+}
     } else {
       generateAIPrompt();
     }
@@ -399,11 +400,21 @@ Return ONLY a JSON object in this exact format, nothing else:
 }
 
 function loadNextPrompt(){
+  const arr=getFilteredPrompts();
+  const total=arr.length;
   currentIndex++;
-  progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
-  saveProgress();
-  resetRecording();
-  generateAIPrompt();
+  if(currentIndex>=total){
+    currentIndex=0;
+    progress[currentMode]=0;
+    saveProgress();
+    resetRecording();
+    replenishFromAI(total);
+  } else {
+    progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
+    saveProgress();
+    resetRecording();
+    generateAIPrompt();
+  }
 }
 function hideResults(){
   document.getElementById('resultsCard').classList.remove('visible');
