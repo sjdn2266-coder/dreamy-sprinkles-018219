@@ -289,12 +289,26 @@ async function replenishFromAI(count){
   };
   const levelHint=currentDiff==='all'?'intermediate':currentDiff;
 
-  const prompt=`Generate exactly ${count} NEW English pronunciation practice prompts for a ${levelHint} learner.
-Type: ${modeDescriptions[currentMode]}
-These must be completely different from common textbook examples.
-Return ONLY a valid JSON array, nothing else, no markdown:
-[{"text":"...","phonetic":"IPA transcription","sub":"one pronunciation tip"},...]`;
+  const prompt = `
+You are a professional English pronunciation coach.
 
+Generate ${count} high-quality English speaking practice sentences.
+
+Requirements:
+- Natural, realistic spoken English
+- Medium difficulty (not too easy, not too hard)
+- Each sentence MUST include at least one pronunciation challenge (th, r, l, consonant clusters, or linking)
+- Avoid simple or generic sentences like "I like apples"
+- All sentences must be different and meaningful
+- No explanations or extra text
+
+Return ONLY a valid JSON array:
+
+[
+  {"text":"...","phonetic":"IPA transcription","sub":"short pronunciation tip"},
+  ...
+]
+`;
   try{
     const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
