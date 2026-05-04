@@ -268,13 +268,68 @@ function getFilteredPrompts(){
   return arr.filter(p=>p.level===currentDiff);
 }
 
-function loadPrompt(idx){
+function loadNextPrompt(){
   const arr=getFilteredPrompts();
-  if(!arr.length) return;
-  const p=arr[idx%arr.length];
-  document.getElementById('promptText').textContent=p.text;
-  document.getElementById('promptPhonetic').textContent=p.phonetic;
-  document.getElementById('promptSub').textContent=p.sub;
+  const total=arr.length;
+  currentIndex++;
+
+  if(currentIndex>=total){
+    // 进度到头，AI生成新一批例句替换本地库，进度清零
+    currentIndex=0;
+    progress[currentMode]=0;
+    saveProgress();
+    resetRecording();
+    replenishFromAI(total);
+  } else {
+    progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
+    saveProgress();
+    resetRecording();
+    generateAIPrompt();
+  }
+}
+ async function replenishFromAI(count){
+  document.getElementById('promptText').textContent='Generating new batch...';
+  document.getElementById('promptPhonetic').textContent='';
+  document.getElementById('promptSub').textContent='';
+
+  const modeDescriptions={
+    sentences:'natural English sentences for daily conversation or professional use',
+    tongue:'English tongue twisters focusing on difficult sound combinations',
+    vocab:'groups of commonly mispronounced English words on related themes',
+    free:'open-ended questions or topic prompts for free speaking practice'
+  };
+  const levelHint=currentDiff==='all'?'intermediate':currentDiff;
+
+  const prompt=`Generate exactly ${count} NEW English pronunciation practice prompts for a ${levelHint} learner.
+Type: ${modeDescriptions[currentMode]}
+These must be completely different from common textbook examples.
+Return ONLY a valid JSON array, nothing else, no markdown:
+[{"text":"...","phonetic":"IPA transcription","sub":"one pronunciation tip"},...]`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'[]';
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    if(Array.isArray(parsed)&&parsed.length>0){
+      // 替换本地例句库中当前模式的数据
+      DB[currentMode]=parsed;
+      loadPrompt(0);
+    } else {
+      generateAIPrompt();
+    }
+  }catch(e){
+    // 失败就直接AI生成单句
+    generateAIPrompt();
+  }
   updateProgressBar();
 }
 
