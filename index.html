@@ -289,13 +289,59 @@ function resetProgress(){
 function saveProgress(){
   try{localStorage.setItem('sf_progress',JSON.stringify(progress));}catch(e){}
 }
+ async function generateAIPrompt(){
+  document.getElementById('promptText').textContent='Generating...';
+  document.getElementById('promptPhonetic').textContent='';
+  document.getElementById('promptSub').textContent='';
+
+  const modeDescriptions={
+    sentences:'a natural English sentence for daily conversation or professional use',
+    tongue:'an English tongue twister focusing on difficult sound combinations',
+    vocab:'a group of 3-4 commonly mispronounced English words on a related theme',
+    free:'an open-ended question or topic prompt for free speaking practice'
+  };
+
+  const levelHint=currentDiff==='all'?'intermediate':currentDiff;
+
+  const prompt=`Generate ONE English pronunciation practice prompt for a ${levelHint} learner.
+Type: ${modeDescriptions[currentMode]}
+Return ONLY a JSON object in this exact format, nothing else:
+{"text":"the sentence or prompt","phonetic":"IPA phonetic transcription","sub":"one specific pronunciation tip focusing on the hardest sound in the sentence"}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'{}';
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    document.getElementById('promptText').textContent=parsed.text||'Try again';
+    document.getElementById('promptPhonetic').textContent=parsed.phonetic||'';
+    document.getElementById('promptSub').textContent=parsed.sub||'';
+  }catch(e){
+    // 如果 AI 失败，回退到本地例句库
+    const arr=getFilteredPrompts();
+    const p=arr[currentIndex%arr.length];
+    document.getElementById('promptText').textContent=p.text;
+    document.getElementById('promptPhonetic').textContent=p.phonetic;
+    document.getElementById('promptSub').textContent=p.sub;
+  }
+  updateProgressBar();
+}
 
 function loadNextPrompt(){
   currentIndex++;
   progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
   saveProgress();
-  loadPrompt(currentIndex);
   resetRecording();
+  generateAIPrompt();
 }
 function hideResults(){
   document.getElementById('resultsCard').classList.remove('visible');
