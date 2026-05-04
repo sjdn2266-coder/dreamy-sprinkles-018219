@@ -296,7 +296,7 @@ Return ONLY a valid JSON array, nothing else, no markdown:
 [{"text":"...","phonetic":"IPA transcription","sub":"one pronunciation tip"},...]`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -352,7 +352,7 @@ Return ONLY a JSON object in this exact format, nothing else:
 {"text":"the sentence or prompt","phonetic":"IPA phonetic transcription","sub":"one specific pronunciation tip focusing on the hardest sound in the sentence"}`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -621,7 +621,7 @@ ${errors.length>0?`Problem words: ${errorList}`:'No significant errors detected.
 Give a short, personal, encouraging coaching response in 2-3 sentences. Be specific about what they did well, then give ONE concrete tip for the most important error. Keep it conversational, warm, and motivating. Do not use bullet points. End with a brief motivational nudge.`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
