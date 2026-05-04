@@ -555,7 +555,8 @@ function tryAgain(){resetRecording()}
 if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
   document.getElementById('noSupport').style.display='block';
 }
-loadPrompt(0);
+currentIndex=progress[currentMode]||0;
+loadPrompt(currentIndex);
 setTimeout(()=>{voices=synth.getVoices()},500);
 </script>
 </body>
