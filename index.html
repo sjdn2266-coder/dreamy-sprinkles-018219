@@ -252,13 +252,41 @@ function setMode(m){
   resetRecording();
 }
 
+function updateProgressBar(){
+  const arr=getFilteredPrompts();
+  const total=arr.length;
+  const done=Math.min(currentIndex,total);
+  document.getElementById('progressTitle').textContent=currentMode.charAt(0).toUpperCase()+currentMode.slice(1)+' · Progress';
+  document.getElementById('progressNums').textContent=done+' / '+total;
+  document.getElementById('progressFill').style.width=(total?Math.round(done/total*100):0)+'%';
+}
+
+function getFilteredPrompts(){
+  const arr=DB[currentMode];
+  if(currentDiff==='all') return arr;
+  return arr.filter(p=>p.level===currentDiff);
+}
+
 function loadPrompt(idx){
-  const arr=prompts[currentMode];
+  const arr=getFilteredPrompts();
+  if(!arr.length) return;
   const p=arr[idx%arr.length];
   document.getElementById('promptText').textContent=p.text;
   document.getElementById('promptPhonetic').textContent=p.phonetic;
   document.getElementById('promptSub').textContent=p.sub;
-  hideResults();
+  updateProgressBar();
+}
+
+function resetProgress(){
+  if(!confirm('Reset progress for '+currentMode+'?')) return;
+  progress[currentMode]=0;
+  currentIndex=0;
+  saveProgress();
+  loadPrompt(0);
+}
+
+function saveProgress(){
+  try{localStorage.setItem('sf_progress',JSON.stringify(progress));}catch(e){}
 }
 
 function loadNextPrompt(){
