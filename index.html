@@ -291,10 +291,11 @@ function saveProgress(){
 
 function loadNextPrompt(){
   currentIndex++;
+  progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
+  saveProgress();
   loadPrompt(currentIndex);
   resetRecording();
 }
-
 function hideResults(){
   document.getElementById('resultsCard').classList.remove('visible');
   document.getElementById('feedbackSection').classList.remove('visible');
