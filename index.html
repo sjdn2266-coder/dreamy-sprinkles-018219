@@ -249,7 +249,7 @@ function setMode(m){
   currentIndex=progress[m]||0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
-  loadPrompt(0);
+  generateAIPrompt();
   resetRecording();
 }
 
@@ -603,7 +603,7 @@ if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
   document.getElementById('noSupport').style.display='block';
 }
 currentIndex=progress[currentMode]||0;
-loadPrompt(currentIndex);
+generateAIPrompt();
 setTimeout(()=>{voices=synth.getVoices()},500);
 </script>
 </body>
