@@ -245,7 +245,7 @@ let currentUtterance=null;
 
 function setMode(m){
   currentMode=m;
-  currentIndex=0;
+  currentIndex=progress[m]||0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
   loadPrompt(0);
