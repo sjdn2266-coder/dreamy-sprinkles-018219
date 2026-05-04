@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --gold:#C9A84C;--gold-light:#F0D98B;--gold-dark:#8B6914;
+    --ink:#1a1a1a;--ink-mid:#444;--ink-light:#888;
+    --paper:#FDFBF7;--paper-mid:#F5F0E8;--paper-dark:#EDE5D4;
+    --red:#C0392B;--green:#1a6b3c;--blue:#1a4a8b;
+    --shadow:0 2px 20px rgba(0,0,0,0.08);
+    --radius:12px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+  .header{text-align:center;padding:2.5rem 1rem 1.5rem;border-bottom:1px solid var(--paper-dark);background:linear-gradient(180deg,#FFF9EE 0%,var(--paper) 100%)}
+  .header h1{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--ink);letter-spacing:-0.5px;line-height:1.1}
+  .header h1 span{color:var(--gold-dark);font-style:italic}
+  .header p{color:var(--ink-light);font-size:0.9rem;margin-top:0.4rem;font-weight:300}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--paper-dark);border:1px solid var(--gold-light);color:var(--gold-dark);font-size:11px;padding:4px 10px;border-radius:20px;margin-top:0.6rem;font-weight:500}
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .main{max-width:780px;margin:0 auto;padding:1.5rem 1rem 3rem}
+  .modes{display:flex;gap:8px;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:4px}
+  .mode-btn{flex:none;padding:8px 16px;border-radius:20px;border:1px solid var(--paper-dark);background:var(--paper);color:var(--ink-mid);font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+  .mode-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .mode-btn:hover:not(.active){background:var(--paper-mid)}
+  .practice-card{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+  .card-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--gold-dark);margin-bottom:0.6rem}
+  .prompt-text{font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.5;color:var(--ink);margin-bottom:0.5rem}
+  .prompt-sub{font-size:13px;color:var(--ink-light);line-height:1.6}
+  .prompt-phonetic{font-size:13px;color:var(--blue);margin-top:0.4rem;font-style:italic}
+  .action-row{display:flex;align-items:center;gap:12px;margin-top:1rem}
+  .btn-next{background:none;border:1px solid var(--paper-dark);color:var(--ink-mid);font-size:13px;padding:8px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+  .btn-next:hover{background:var(--paper-mid)}
+  .mic-section{display:flex;flex-direction:column;align-items:center;padding:2rem 1rem;background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow)}
+  .mic-ring{position:relative;width:96px;height:96px;cursor:pointer;margin-bottom:1rem}
+  .mic-ring svg{width:96px;height:96px;position:absolute;top:0;left:0}
+  .ring-bg{fill:none;stroke:var(--paper-dark);stroke-width:2}
+  .ring-prog{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 0.3s;transform-origin:center;transform:rotate(-90deg)}
+  .mic-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:28px;transition:all 0.2s;background:var(--paper-mid)}
+  .mic-btn.idle{background:var(--paper-mid);box-shadow:0 0 0 0 rgba(201,168,76,0)}
+  .mic-btn.recording{background:#C0392B;animation:recpulse 1.5s infinite;box-shadow:0 0 0 8px rgba(192,57,43,0.15)}
+  @keyframes recpulse{0%,100%{box-shadow:0 0 0 8px rgba(192,57,43,0.1)}50%{box-shadow:0 0 0 16px rgba(192,57,43,0.05)}}
+  .mic-status{font-size:13px;color:var(--ink-light);font-weight:300}
+  .waveform{display:flex;align-items:center;gap:3px;height:36px;margin:0.5rem 0;opacity:0;transition:opacity 0.3s}
+  .waveform.active{opacity:1}
+  .wave-bar{width:3px;border-radius:3px;background:var(--gold);animation:wave 0.8s ease-in-out infinite;min-height:4px}
+  @keyframes wave{0%,100%{height:4px}50%{height:28px}}
+  .transcript-box{width:100%;background:var(--paper-mid);border:1px solid var(--paper-dark);border-radius:8px;padding:1rem;min-height:60px;font-size:15px;line-height:1.7;color:var(--ink);margin-top:1rem;font-style:italic}
+  .transcript-placeholder{color:var(--ink-light);font-style:normal;font-size:13px}
+  .analyze-btn{margin-top:1rem;padding:12px 32px;background:var(--ink);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;display:none}
+  .analyze-btn:hover{background:#333}
+  .analyze-btn.visible{display:block}
+  .results-card{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);display:none}
+  .results-card.visible{display:block}
+  .score-row{display:flex;gap:12px;margin-bottom:1.2rem;flex-wrap:wrap}
+  .score-chip{flex:1;min-width:80px;text-align:center;background:var(--paper-mid);border-radius:8px;padding:0.8rem 0.5rem}
+  .score-num{font-family:'DM Serif Display',serif;font-size:1.8rem;line-height:1}
+  .score-num.good{color:var(--green)}
+  .score-num.ok{color:var(--gold-dark)}
+  .score-num.poor{color:var(--red)}
+  .score-label{font-size:11px;color:var(--ink-light);margin-top:4px}
+  .comparison{margin:1rem 0}
+  .comp-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);margin-bottom:6px}
+  .comp-line{display:flex;flex-wrap:wrap;gap:4px;line-height:2;font-size:15px}
+  .word-ok{color:var(--green);border-bottom:2px solid var(--green);padding:1px 0}
+  .word-warn{color:var(--gold-dark);border-bottom:2px solid var(--gold);padding:1px 0;background:rgba(240,217,139,0.15);border-radius:2px}
+  .word-err{color:var(--red);border-bottom:2px solid var(--red);padding:1px 0;background:rgba(192,57,43,0.08);border-radius:2px;cursor:help}
+  .word-miss{color:var(--ink-light);opacity:0.4;text-decoration:line-through}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:0.8rem}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-light)}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+  .tips-list{list-style:none;margin-top:1rem}
+  .tip-item{display:flex;gap:10px;padding:0.6rem 0;border-top:1px solid var(--paper-mid);font-size:14px;line-height:1.5}
+  .tip-icon{flex-none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+  .tip-icon.warn{background:rgba(240,217,139,0.4);color:var(--gold-dark)}
+  .tip-icon.err{background:rgba(192,57,43,0.1);color:var(--red)}
+  .feedback-section{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);display:none}
+  .feedback-section.visible{display:block}
+  .ai-voice-row{display:flex;align-items:center;gap:12px;margin-top:1rem}
+  .play-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--paper-dark);background:var(--paper-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;flex-none}
+  .play-btn:hover{background:var(--paper-dark)}
+  .play-btn.playing{background:var(--gold-dark);color:#fff;border-color:var(--gold-dark)}
+  .play-label{font-size:13px;color:var(--ink-mid)}
+  .play-sub{font-size:12px;color:var(--ink-light)}
+  .ai-response{font-size:14px;line-height:1.8;color:var(--ink-mid);margin-top:1rem;padding:1rem;background:var(--paper-mid);border-radius:8px;border-left:3px solid var(--gold)}
+  .loading-dots::after{content:'';animation:dots 1.5s infinite}
+  @keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+  .no-support{text-align:center;padding:2rem;color:var(--red);font-size:14px;background:rgba(192,57,43,0.05);border-radius:8px;border:1px solid rgba(192,57,43,0.2)}
+  .progress-bar{height:3px;background:var(--paper-dark);border-radius:3px;margin-top:0.5rem;overflow:hidden}
+  .progress-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.3s}
+  .tabs{display:flex;border-bottom:1px solid var(--paper-dark);margin-bottom:1.2rem;gap:0}
+  .tab{padding:8px 16px;font-size:13px;color:var(--ink-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+  .tab.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+  .section-hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Speak<span>Flow</span></h1>
+  <p>AI-powered English pronunciation coach</p>
+  <div class="badge">Real-time analysis · Native voice feedback</div>
+</div>
+
+<div class="main">
+  <div class="modes">
+    <button class="mode-btn active" onclick="setMode('sentences')">Sentences</button>
+    <button class="mode-btn" onclick="setMode('tongue')">Tongue twisters</button>
+    <button class="mode-btn" onclick="setMode('vocab')">Vocabulary</button>
+    <button class="mode-btn" onclick="setMode('free')">Free speech</button>
+  </div>
+
+  <div class="practice-card" id="promptCard">
+    <div class="card-label">Practice prompt</div>
+    <div class="prompt-text" id="promptText">She sells seashells by the seashore.</div>
+    <div class="prompt-phonetic" id="promptPhonetic">/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/</div>
+    <div class="prompt-sub" id="promptSub">Focus on the "sh" /ʃ/ vs "s" /s/ distinction. Keep your tongue close to the roof of your mouth for "sh".</div>
+    <div class="action-row">
+      <button class="btn-next" onclick="loadNextPrompt()">Next prompt ↻</button>
+      <button class="btn-next" onclick="speakPrompt()">▶ Hear it</button>
+    </div>
+  </div>
+
+  <div class="mic-section">
+    <div class="mic-ring" onclick="toggleRecording()" id="micRing">
+      <svg viewBox="0 0 96 96"><circle class="ring-bg" cx="48" cy="48" r="45"/><circle class="ring-prog" id="ringProg" cx="48" cy="48" r="45"/></svg>
+      <button class="mic-btn idle" id="micBtn">🎙</button>
+    </div>
+    <div class="waveform" id="waveform">
+      <div class="wave-bar" style="animation-delay:0s"></div>
+      <div class="wave-bar" style="animation-delay:0.1s"></div>
+      <div class="wave-bar" style="animation-delay:0.2s"></div>
+      <div class="wave-bar" style="animation-delay:0.3s"></div>
+      <div class="wave-bar" style="animation-delay:0.15s"></div>
+      <div class="wave-bar" style="animation-delay:0.05s"></div>
+      <div class="wave-bar" style="animation-delay:0.25s"></div>
+    </div>
+    <div class="mic-status" id="micStatus">Tap the mic to start recording</div>
+    <div class="transcript-box" id="transcriptBox">
+      <span class="transcript-placeholder">Your speech will appear here as you speak...</span>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeNow()">Analyze my pronunciation</button>
+  </div>
+
+  <div class="results-card" id="resultsCard">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
+      <div class="tab" onclick="switchTab('tips')">Tips</div>
+    </div>
+    <div id="tabAnalysis">
+      <div class="score-row" id="scoreRow"></div>
+      <div class="comparison">
+        <div class="comp-label">Word-by-word breakdown</div>
+        <div class="comp-line" id="wordBreakdown"></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Correct</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Needs work</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Incorrect</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--ink-light)"></div>Missed</div>
+        </div>
+      </div>
+    </div>
+    <div id="tabTips" class="section-hidden">
+      <ul class="tips-list" id="tipsList"></ul>
+    </div>
+  </div>
+
+  <div class="feedback-section" id="feedbackSection">
+    <div class="card-label">AI coach feedback</div>
+    <div class="ai-response" id="aiResponse"></div>
+    <div class="ai-voice-row">
+      <button class="play-btn" id="playFeedbackBtn" onclick="playFeedback()">▶</button>
+      <div>
+        <div class="play-label">Hear coach feedback</div>
+        <div class="play-sub">Natural voice · native accent</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn-next" onclick="tryAgain()">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-support" id="noSupport" style="display:none">
+    Your browser does not support the Web Speech API. Please use Chrome or Edge for full functionality.
+  </div>
+</div>
+
+<script>
+const prompts = {
+  sentences:[
+    {text:"She sells seashells by the seashore.",phonetic:"/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/",sub:"Focus on 'sh' /ʃ/ vs 's' /s/. Keep tongue close to roof of mouth for 'sh'."},
+    {text:"The weather in Edinburgh is rather unpredictable.",phonetic:"/ðə ˈwɛðər ɪn ˈɛdɪnbrə ɪz ˈrɑːðər ʌnprɪˈdɪktəbl/",sub:"Practice the 'th' /ð/ sound — tongue lightly touching upper teeth."},
+    {text:"I thought thoroughly about the theory.",phonetic:"/aɪ θɔːt ˈθɜːrəli əˈbaʊt ðə ˈθɪəri/",sub:"Both 'th' sounds: /θ/ (voiceless) in 'thought' and 'theory', /ð/ (voiced) in 'the'."},
+    {text:"Could you please pass me the butter?",phonetic:"/kʊd juː pliːz pɑːs miː ðə ˈbʌtər/",sub:"Natural reductions: 'could you' → /kʊdʒə/. The 't' in 'butter' is a flap /ɾ/ in American English."},
+    {text:"I would have gone if I had known.",phonetic:"/aɪ wʊd həv ɡɒn ɪf aɪ həd nəʊn/",sub:"Focus on the third conditional structure and natural rhythm with reduced 'have' → /həv/."},
+  ],
+  tongue:[
+    {text:"How much wood would a woodchuck chuck?",phonetic:"/haʊ mʌtʃ wʊd wʊd ə ˈwʊdtʃʌk tʃʌk/",sub:"The /w/ sound: lips rounded, voice from throat. Try 3x speed."},
+    {text:"Red lorry, yellow lorry, red lorry, yellow lorry.",phonetic:"/rɛd ˈlɒri ˈjɛloʊ ˈlɒri/",sub:"Alternate between /r/ and /l/. These are the two most commonly confused consonants."},
+    {text:"Unique New York, unique New York, you know you need unique New York.",phonetic:"/juːˈniːk njuː jɔːk/",sub:"The /juː/ (yoo) sound needs the back of your tongue raised toward the palate."},
+  ],
+  vocab:[
+    {text:"Particularly, specifically, and simultaneously.",phonetic:"/pəˈtɪkjʊləli speˈsɪfɪkli ænd saɪˌmʌlˈteɪniəsli/",sub:"Long multisyllabic adverbs. Stress pattern: par-TIC-u-lar-ly, si-mul-TA-ne-ous-ly."},
+    {text:"Entrepreneur, bureaucracy, phenomenon.",phonetic:"/ˌɒntrəprəˈnɜːr bjʊˈrɒkrəsi fɪˈnɒmɪnən/",sub:"Common mispronounced words. Note: 'entrepreneur' has French origin — the 'r' is not silent."},
+    {text:"February, library, comfortable, temperature.",phonetic:"/ˈfebruəri ˈlaɪbrəri ˈkʌmftəbl ˈtɛmprɪtʃər/",sub:"Words where letters are often dropped in casual speech. Try both formal and casual versions."},
+  ],
+  free:[
+    {text:"Tell me about your weekend plans.",phonetic:"Free response — aim for natural fluency",sub:"Speak freely for 30–60 seconds. Focus on intonation, rhythm, and linking words naturally."},
+    {text:"Describe your favorite place in the world.",phonetic:"Free response — aim for natural fluency",sub:"Use vivid adjectives and vary your sentence length. Don't forget sentence stress."},
+    {text:"What's something you've learned recently?",phonetic:"Free response — aim for natural fluency",sub:"Practice organizing your thoughts: point, reason, example. Use transition phrases."},
+  ]
+};
+
+let currentMode='sentences';
+let currentIndex=0;
+let recognition=null;
+let isRecording=false;
+let transcript='';
+let feedbackText='';
+let synth=window.speechSynthesis;
+let voices=[];
+let currentUtterance=null;
+
+function setMode(m){
+  currentMode=m;
+  currentIndex=0;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadPrompt(0);
+  resetRecording();
+}
+
+function loadPrompt(idx){
+  const arr=prompts[currentMode];
+  const p=arr[idx%arr.length];
+  document.getElementById('promptText').textContent=p.text;
+  document.getElementById('promptPhonetic').textContent=p.phonetic;
+  document.getElementById('promptSub').textContent=p.sub;
+  hideResults();
+}
+
+function loadNextPrompt(){
+  currentIndex++;
+  loadPrompt(currentIndex);
+  resetRecording();
+}
+
+function hideResults(){
+  document.getElementById('resultsCard').classList.remove('visible');
+  document.getElementById('feedbackSection').classList.remove('visible');
+}
+
+function resetRecording(){
+  transcript='';
+  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">Your speech will appear here as you speak...</span>';
+  document.getElementById('analyzeBtn').classList.remove('visible');
+  hideResults();
+  if(isRecording) stopRecording();
+}
+
+function speakPrompt(){
+  const text=document.getElementById('promptText').textContent;
+  speakText(text,'en-GB');
+}
+
+function speakText(text,lang,rate){
+  if(currentUtterance){synth.cancel();currentUtterance=null}
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang||'en-US';
+  u.rate=rate||0.92;
+  u.pitch=1.05;
+  const preferred=['Google UK English Female','Google US English','Microsoft Zira','Samantha','Karen'];
+  if(voices.length===0) voices=synth.getVoices();
+  let chosen=null;
+  for(const name of preferred){
+    chosen=voices.find(v=>v.name.includes(name.split(' ')[1])&&v.lang.startsWith('en'));
+    if(chosen) break;
+  }
+  if(!chosen) chosen=voices.find(v=>v.lang.startsWith('en'));
+  if(chosen) u.voice=chosen;
+  currentUtterance=u;
+  u.onend=()=>{currentUtterance=null;document.getElementById('playFeedbackBtn').classList.remove('playing')};
+  synth.speak(u);
+}
+
+if(synth) synth.onvoiceschanged=()=>{voices=synth.getVoices()};
+
+function toggleRecording(){
+  if(isRecording) stopRecording();
+  else startRecording();
+}
+
+function startRecording(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    document.getElementById('noSupport').style.display='block';
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.lang='en-US';
+  recognition.interimResults=true;
+  recognition.continuous=true;
+  recognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    transcript+=final;
+    const display=transcript+(interim?' <em style="color:var(--ink-light)">'+interim+'</em>':'');
+    document.getElementById('transcriptBox').innerHTML=display||'<span class="transcript-placeholder">Listening...</span>';
+    if(transcript.trim()) document.getElementById('analyzeBtn').classList.add('visible');
+  };
+  recognition.onerror=e=>{
+    document.getElementById('micStatus').textContent='Error: '+e.error+'. Please try again.';
+    stopRecording();
+  };
+  recognition.onend=()=>{if(isRecording) recognition.start()};
+  recognition.start();
+  isRecording=true;
+  document.getElementById('micBtn').className='mic-btn recording';
+  document.getElementById('micBtn').textContent='⏹';
+  document.getElementById('micStatus').textContent='Recording... tap to stop';
+  document.getElementById('waveform').classList.add('active');
+}
+
+function stopRecording(){
+  if(recognition){recognition.stop();recognition=null}
+  isRecording=false;
+  document.getElementById('micBtn').className='mic-btn idle';
+  document.getElementById('micBtn').textContent='🎙';
+  document.getElementById('micStatus').textContent='Tap the mic to record again';
+  document.getElementById('waveform').classList.remove('active');
+}
+
+function analyzeNow(){
+  stopRecording();
+  const target=document.getElementById('promptText').textContent;
+  const spoken=transcript.trim();
+  if(!spoken) return;
+  showAnalysis(target,spoken);
+}
+
+function tokenize(s){return s.toLowerCase().replace(/[^a-z\s']/g,'').split(/\s+/).filter(Boolean)}
+
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++) dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function scoreWord(target,spoken){
+  if(!spoken) return 'miss';
+  if(target===spoken) return 'ok';
+  const d=levenshtein(target,spoken);
+  const ratio=d/Math.max(target.length,spoken.length);
+  if(ratio<=0.2) return 'ok';
+  if(ratio<=0.45) return 'warn';
+  return 'err';
+}
+
+function alignWords(tWords,sWords){
+  const results=[];
+  let si=0;
+  for(let ti=0;ti<tWords.length;ti++){
+    const tw=tWords[ti];
+    if(si>=sWords.length){results.push({target:tw,spoken:null,status:'miss'});continue}
+    const sw=sWords[si];
+    const st=scoreWord(tw,sw);
+    if(st==='miss'&&si+1<sWords.length){
+      const st2=scoreWord(tw,sWords[si+1]);
+      if(st2!=='miss'){results.push({target:tw,spoken:null,status:'miss'});continue}
+    }
+    results.push({target:tw,spoken:sw,status:st});
+    si++;
+  }
+  return results;
+}
+
+function showAnalysis(target,spoken){
+  const tWords=tokenize(target);
+  const sWords=tokenize(spoken);
+  const alignment=alignWords(tWords,sWords);
+
+  const okCount=alignment.filter(w=>w.status==='ok').length;
+  const warnCount=alignment.filter(w=>w.status==='warn').length;
+  const errCount=alignment.filter(w=>w.status==='err').length;
+  const missCount=alignment.filter(w=>w.status==='miss').length;
+  const total=tWords.length;
+
+  const accuracy=Math.round((okCount/total)*100);
+  const fluency=Math.min(100,Math.round(100-((errCount*15+missCount*20+warnCount*8))));
+  const overall=Math.round((accuracy*0.5+Math.max(0,fluency)*0.5));
+
+  const scoreClass=s=>s>=80?'good':s>=60?'ok':'poor';
+
+  document.getElementById('scoreRow').innerHTML=`
+    <div class="score-chip"><div class="score-num ${scoreClass(overall)}">${overall}</div><div class="score-label">Overall</div></div>
+    <div class="score-chip"><div class="score-num ${scoreClass(accuracy)}">${accuracy}%</div><div class="score-label">Accuracy</div></div>
+    <div class="score-chip"><div class="score-num ${scoreClass(Math.max(0,fluency))}">${Math.max(0,fluency)}</div><div class="score-label">Fluency</div></div>
+    <div class="score-chip"><div class="score-num ${scoreClass(okCount>0?100:0)}">${okCount}/${total}</div><div class="score-label">Words correct</div></div>
+  `;
+
+  document.getElementById('wordBreakdown').innerHTML=alignment.map(w=>{
+    const cls='word-'+w.status;
+    const disp=w.target;
+    const title=w.spoken?`title="You said: ${w.spoken}"`:'';
+    return `<span class="${cls}" ${title}>${disp}</span>`;
+  }).join(' ');
+
+  const tips=[];
+  alignment.filter(w=>w.status==='err'||w.status==='warn').forEach(w=>{
+    if(w.spoken){
+      const icon=w.status==='err'?'err':'warn';
+      tips.push({icon,text:`"${w.target}" — you said "${w.spoken}". ${getTip(w.target,w.spoken)}`});
+    }
+  });
+  if(missCount>0) tips.push({icon:'err',text:`${missCount} word(s) were not detected. Try speaking more clearly and at a moderate pace.`});
+
+  document.getElementById('tipsList').innerHTML=tips.map(t=>`
+    <li class="tip-item">
+      <div class="tip-icon ${t.icon}">${t.icon==='err'?'!':'~'}</div>
+      <div>${t.text}</div>
+    </li>
+  `).join('')||'<li class="tip-item"><div class="tip-icon" style="background:rgba(26,107,60,0.1);color:var(--green)">✓</div><div>Excellent! No major pronunciation issues detected.</div></li>';
+
+  document.getElementById('resultsCard').classList.add('visible');
+
+  generateFeedback(target,spoken,overall,accuracy,fluency,alignment);
+}
+
+function getTip(target,spoken){
+  const pairs=[
+    [['th','the'],['d','de','da'],'The /ð/ sound: touch your upper teeth lightly with your tongue tip and vibrate.'],
+    [['th'],['t','f','s'],'The /θ/ sound: tongue between teeth, breathe out gently without vibrating.'],
+    [['sh','she','show'],['s','z'],'The /ʃ/ sound: lips rounded and pushed forward, tongue back.'],
+    [['v','very','have'],['b','w'],'The /v/ sound: upper teeth on lower lip, vibrate.'],
+    [['w','was','were'],['v'],'The /w/ sound: round your lips fully, no teeth contact.'],
+  ];
+  for(const [targets,,tip] of pairs){
+    if(targets.some(t=>target.includes(t))||targets.some(t=>spoken.includes(t))) return tip;
+  }
+  const dl=levenshtein(target,spoken);
+  if(dl===1) return `Very close! Check the ${dl===1?'ending':'middle'} of the word.`;
+  return `Break it into syllables and practice slowly: ${target.split('').join('-·-').replace(/-·-/g,'')}.`;
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tabAnalysis').className=tab==='analysis'?'':'section-hidden';
+  document.getElementById('tabTips').className=tab==='tips'?'':'section-hidden';
+}
+
+async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
+  document.getElementById('feedbackSection').classList.add('visible');
+  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">Generating coach feedback</span>';
+
+  const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
+  const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
+
+  const prompt=`You are a warm, encouraging English pronunciation coach. A learner just practiced saying:
+
+Target: "${target}"
+They said: "${spoken}"
+Overall score: ${overall}/100, Accuracy: ${accuracy}%, Fluency: ${fluency}/100
+${errors.length>0?`Problem words: ${errorList}`:'No significant errors detected.'}
+
+Give a short, personal, encouraging coaching response in 2-3 sentences. Be specific about what they did well, then give ONE concrete tip for the most important error. Keep it conversational, warm, and motivating. Do not use bullet points. End with a brief motivational nudge.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    feedbackText=data.content?.[0]?.text||'Great effort! Keep practicing and you will improve every day.';
+  }catch(e){
+    feedbackText=overall>=80?
+      "Excellent work! Your pronunciation is very clear and natural. Keep up this great momentum — consistent practice is the key to sounding like a native speaker!":
+      "Good effort! You're making real progress. Focus on the highlighted words and try slowing down slightly for tricky sounds. Every practice session builds your muscle memory — keep going!";
+  }
+  document.getElementById('aiResponse').textContent=feedbackText;
+}
+
+function playFeedback(){
+  const btn=document.getElementById('playFeedbackBtn');
+  if(currentUtterance){synth.cancel();currentUtterance=null;btn.classList.remove('playing');btn.textContent='▶';return}
+  if(!feedbackText) return;
+  btn.classList.add('playing');
+  btn.textContent='⏸';
+  speakText(feedbackText,'en-US',0.9);
+  setTimeout(()=>{btn.classList.remove('playing');btn.textContent='▶'},500);
+}
+
+function tryAgain(){resetRecording()}
+
+if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+  document.getElementById('noSupport').style.display='block';
+}
+loadPrompt(0);
+setTimeout(()=>{voices=synth.getVoices()},500);
+</script>
+</body>
+</html>
