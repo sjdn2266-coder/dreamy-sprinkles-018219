@@ -332,7 +332,7 @@ function resetProgress(){
 function saveProgress(){
   try{localStorage.setItem('sf_progress',JSON.stringify(progress));}catch(e){}
 }
- async function generateAIPrompt(){
+async function generateAIPrompt(){
   document.getElementById('promptText').textContent='Generating...';
   document.getElementById('promptPhonetic').textContent='';
   document.getElementById('promptSub').textContent='';
@@ -348,34 +348,65 @@ function saveProgress(){
 
   const prompt=`Generate ONE English pronunciation practice prompt for a ${levelHint} learner.
 Type: ${modeDescriptions[currentMode]}
-Return ONLY a JSON object in this exact format, nothing else:
-{"text":"the sentence or prompt","phonetic":"IPA phonetic transcription","sub":"one specific pronunciation tip focusing on the hardest sound in the sentence"}`;
+
+Return ONLY JSON. No explanation. No markdown.
+
+Format:
+{"text":"...","phonetic":"...","sub":"..."}`;
 
   try{
-    const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
+    const res=await fetch('你的worker地址',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
         messages:[{role:'user',content:prompt}]
       })
     });
+
     const data=await res.json();
-    const raw=data.content?.[0]?.text||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
-    document.getElementById('promptText').textContent=parsed.text||parsed.sentence||Object.values(parsed)[0]||'Try again';
-    document.getElementById('promptPhonetic').textContent=parsed.phonetic||'';
-    document.getElementById('promptSub').textContent=parsed.sub||'';
+
+    const raw = data.content?.[0]?.text || '';
+
+    console.log("AI RAW:", raw);
+
+    let parsed = null;
+
+    // ✅ 1. 尝试直接解析
+    try{
+      parsed = JSON.parse(raw);
+    }catch(e){
+      // ✅ 2. 尝试从文本中提取 JSON
+      const match = raw.match(/\{[\s\S]*\}/);
+      if(match){
+        try{
+          parsed = JSON.parse(match[0]);
+        }catch(e){}
+      }
+    }
+
+    // ✅ 3. 如果成功解析
+    if(parsed && parsed.text){
+      document.getElementById('promptText').textContent = parsed.text;
+      document.getElementById('promptPhonetic').textContent = parsed.phonetic || '';
+      document.getElementById('promptSub').textContent = parsed.sub || '';
+    }
+    else{
+      // ✅ 4. fallback：直接显示AI原文（关键！）
+      document.getElementById('promptText').textContent = raw || 'Try again';
+    }
+
   }catch(e){
-    // 如果 AI 失败，回退到本地例句库
+    console.error(e);
+
+    // ❗最终兜底（本地库）
     const arr=getFilteredPrompts();
     const p=arr[currentIndex%arr.length];
+
     document.getElementById('promptText').textContent=p.text;
     document.getElementById('promptPhonetic').textContent=p.phonetic;
     document.getElementById('promptSub').textContent=p.sub;
   }
+
   updateProgressBar();
 }
 
