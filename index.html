@@ -233,6 +233,8 @@ const prompts = {
 
 let currentMode='sentences';
 let currentIndex=0;
+let progress={sentences:0,tongue:0,vocab:0,free:0};
+try{const s=localStorage.getItem('sf_progress');if(s)progress=JSON.parse(s);}catch(e){}
 let recognition=null;
 let isRecording=false;
 let transcript='';
