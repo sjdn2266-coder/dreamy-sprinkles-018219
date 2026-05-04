@@ -360,14 +360,65 @@ async function generateAIPrompt(){
 
   const levelHint=currentDiff==='all'?'intermediate':currentDiff;
 
-  const prompt=`Generate ONE English pronunciation practice prompt for a ${levelHint} learner.
+  const prompt = `
+You are an elite English pronunciation coach and content designer.
+
+Your job is to create ONE high-quality speaking practice sentence for a ${levelHint} learner.
 Type: ${modeDescriptions[currentMode]}
 
-Return ONLY JSON. No explanation. No markdown.
+This is NOT a random sentence. It must feel like it was carefully designed for training.
+
+STRICT REQUIREMENTS:
+
+1. Naturalness
+- The sentence must sound like something a native speaker would actually say in real life
+- Avoid textbook or generic sentences
+
+2. Length & rhythm
+- 10–18 words
+- Must have natural rhythm and stress pattern (not flat or robotic)
+
+3. Pronunciation focus (VERY IMPORTANT)
+- Include at least TWO of the following:
+  • "th" sound (think, this, though)
+  • "r" vs "l"
+  • consonant clusters (e.g. "str", "pl", "dr")
+  • linking between words
+  • stress shifts (important syllables)
+- The difficulty should be noticeable but not extreme
+
+4. Meaning
+- The sentence should be slightly interesting, emotional, or situational
+- Avoid boring facts like "I go to school"
+
+5. Variety
+- Do NOT repeat common patterns
+- Make each sentence feel unique and real
+
+---
+
+OUTPUT RULES (CRITICAL):
+
+Return ONLY valid JSON.
+No explanation. No markdown. No extra text.
 
 Format:
-{"text":"...","phonetic":"...","sub":"..."}`;
+{
+  "text": "...",
+  "phonetic": "...",
+  "sub": "one precise pronunciation tip focused on the hardest part"
+}
 
+---
+
+SELF-CHECK BEFORE OUTPUT:
+
+- Would a native speaker actually say this? If not, rewrite it.
+- Does it contain at least TWO pronunciation challenges? If not, rewrite it.
+- Is it more interesting than a basic textbook sentence? If not, rewrite it.
+
+Only output when all conditions are satisfied.
+`;
   try{
     const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
