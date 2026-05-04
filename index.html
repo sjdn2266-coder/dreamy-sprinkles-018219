@@ -123,6 +123,14 @@
   </div>
 
   <div class="practice-card" id="promptCard">
+   <div class="progress-wrap">
+  <div class="progress-header">
+    <span class="progress-title" id="progressTitle">Sentences · Progress</span>
+    <span class="progress-nums" id="progressNums">0 / 0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <span class="progress-reset" onclick="resetProgress()">Reset progress</span>
+</div>
     <div class="card-label">Practice prompt</div>
     <div class="prompt-text" id="promptText">She sells seashells by the seashore.</div>
     <div class="prompt-phonetic" id="promptPhonetic">/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/</div>
