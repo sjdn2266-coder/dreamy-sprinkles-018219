@@ -268,7 +268,7 @@ function setMode(m){
   document.getElementById('playFeedbackBtn').style.display='';
   document.getElementById('listenSelfBtn').style.display='none';
   document.getElementById('hearXiangeBtn').style.display='none';
-  document.getElementById('hearItBtn').style.display='';
+  document.getElementById('hearItBtn').style.display=m==='free'?'none':'';
   generateAIPrompt();
   resetRecording();
 }
