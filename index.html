@@ -706,14 +706,14 @@ async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
   const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
 
- const prompt=`你是一位温暖、鼓励性的英语发音教练。学员刚刚练习了以下内容：
+ const prompt=`你是一位严厉、高要求的英语发音教练。学员刚刚练习了以下内容：
 
 目标句子："${target}"
 学员说的："${spoken}"
 综合评分：${overall}/100，准确率：${accuracy}%，流利度：${fluency}/100
 ${errors.length>0?`问题词汇：${errorList}`:'未发现明显错误。'}
 
-请用中文给出2-3句简短、个人化、鼓励性的教练反馈。具体指出学员做得好的地方，然后针对最重要的错误给出一个具体建议。语气要亲切自然，最后加一句简短的鼓励。不要使用列表或符号。`;
+请用中文给出2-3句简短、个人化、针对性的教练反馈。具体指出学员做得好的地方，然后针对最重要的错误给出一个具体建议，和适当的批评，语气要自然严格，最后加一句简短的鼓励。不要使用列表或符号。`;
     try{
      const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
