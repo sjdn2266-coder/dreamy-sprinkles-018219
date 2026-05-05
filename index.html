@@ -307,8 +307,11 @@ Requirements:
 - Each sentence MUST include at least one pronunciation challenge (th, r, l, consonant clusters, or linking)
 - Avoid simple or generic sentences like "I like apples"
 - Avoid overusing the word "though" — use it in at most 1 out of every 5 sentences
-- All sentences must be different and meaningful
+- Every sentence MUST have a completely different subject, verb, action, setting, and topic from all other sentences in this batch
+- Imagine each sentence comes from a totally different person, place, and situation in life
+- For example: one sentence about cooking, one about travel, one about technology, one about emotions, one about nature — never two sentences from the same domain
 - Must be completely different in topic, vocabulary, and structure from these recent sentences: ${DB[currentMode].slice(-5).map(p=>p.text).join(' | ')}
+- If two sentences feel similar in any way, replace one of them before outputting
 - No explanations or extra text
 
 Return ONLY a valid JSON array:
