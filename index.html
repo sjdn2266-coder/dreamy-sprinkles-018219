@@ -300,6 +300,7 @@ Requirements:
 - Each sentence MUST include at least one pronunciation challenge (th, r, l, consonant clusters, or linking)
 - Avoid simple or generic sentences like "I like apples"
 - All sentences must be different and meaningful
+- Must be completely different in topic, vocabulary, and structure from these recent sentences: ${DB[currentMode].slice(-5).map(p=>p.text).join(' | ')}
 - No explanations or extra text
 
 Return ONLY a valid JSON array:
