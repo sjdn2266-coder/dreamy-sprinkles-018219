@@ -463,8 +463,12 @@ Only output when all conditions are satisfied.
     }
 
     // ✅ 3. 如果成功解析
-    if(parsed && parsed.text){
-      document.getElementById('promptText').textContent = parsed.text;
+if(parsed && parsed.text){
+  if(parsed.text.toLowerCase().includes('though')&&Math.random()<0.6){
+    generateAIPrompt();
+    return;
+  }
+  document.getElementById('promptText').textContent = parsed.text;
       document.getElementById('promptPhonetic').textContent = parsed.phonetic || '';
       document.getElementById('promptSub').textContent = parsed.sub || '';
     }
