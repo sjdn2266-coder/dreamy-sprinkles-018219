@@ -757,7 +757,7 @@ async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
   const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
 
- const prompt=`你是一位严厉、高要求的英语发音教练。学员刚刚练习了以下内容：
+ const prompt=`你是一位严厉、高要求的英语发音教练，名叫贤哥。学员刚刚练习了以下内容：
 
 目标句子："${target}"
 学员说的："${spoken}"
