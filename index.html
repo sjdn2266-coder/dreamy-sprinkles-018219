@@ -292,7 +292,7 @@ async function replenishFromAI(count){
     sentences:'natural English sentences for daily conversation or professional use',
     tongue:'English tongue twisters focusing on difficult sound combinations',
     vocab:'groups of commonly mispronounced English words on related themes',
-    free:'open-ended questions or topic prompts for free speaking practice'
+    free:'a natural everyday conversational question that a real person would ask in daily life — such as asking opinions, making plans, checking in with someone, or starting small talk. Must end with a question mark.',
   };
   const levelHint=currentDiff==='all'?'intermediate':currentDiff;
 
@@ -370,7 +370,7 @@ async function generateAIPrompt(){
     sentences:'a natural English sentence for daily conversation or professional use',
     tongue:'an English tongue twister focusing on difficult sound combinations',
     vocab:'a group of 3-4 commonly mispronounced English words on a related theme',
-    free:'an open-ended question or topic prompt for free speaking practice'
+   free:'natural everyday conversational questions that real people ask in daily life — asking opinions, making plans, checking in, or small talk. Every sentence must end with a question mark.',
   };
 
   const levelHint=currentDiff==='all'?'intermediate':currentDiff;
