@@ -753,7 +753,7 @@ async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment
     return;
   }
   document.getElementById('feedbackSection').classList.add('visible');
-  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">正在生成教练反馈</span>';
+  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">贤哥正在点评中</span>';
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
   const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
 
