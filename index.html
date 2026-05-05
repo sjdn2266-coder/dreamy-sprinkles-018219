@@ -715,7 +715,8 @@ async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment
 ${errors.length>0?`问题词汇：${errorList}`:'未发现明显错误。'}
 
 请用中文给出2-3句简短、个人化、鼓励性的教练反馈。具体指出学员做得好的地方，然后针对最重要的错误给出一个具体建议。语气要亲切自然，最后加一句简短的鼓励。不要使用列表或符号。`;
-    const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
+    try{
+     const res=await fetch('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
