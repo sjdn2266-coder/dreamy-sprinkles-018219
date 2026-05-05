@@ -506,6 +506,7 @@ function loadNextPrompt(){
   const arr=getFilteredPrompts();
   const total=arr.length;
   currentIndex++;
+  window._lastAudioURL=null;
   if(currentIndex>=total){
     currentIndex=0;
     progress[currentMode]=0;
