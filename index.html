@@ -90,8 +90,6 @@
   .loading-dots::after{content:'';animation:dots 1.5s infinite}
   @keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
   .no-support{text-align:center;padding:2rem;color:var(--red);font-size:14px;background:rgba(192,57,43,0.05);border-radius:8px;border:1px solid rgba(192,57,43,0.2)}
-  .progress-bar{height:3px;background:var(--paper-dark);border-radius:3px;margin-top:0.5rem;overflow:hidden}
-  .progress-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.3s}
   .tabs{display:flex;border-bottom:1px solid var(--paper-dark);margin-bottom:1.2rem;gap:0}
   .tab{padding:8px 16px;font-size:13px;color:var(--ink-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
   .tab.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
@@ -104,7 +102,7 @@
 .progress-fill{height:100%;background:var(--gold);border-radius:6px;transition:width 0.4s ease}
 .progress-reset{font-size:11px;color:var(--ink-light);cursor:pointer;text-decoration:underline;margin-top:0.4rem;display:inline-block}
 .progress-reset:hover{color:var(--red)}
- .float-wechat{position:fixed;top:16px;left:16px;z-index:999;background:#fff;border:1px solid var(--paper-dark);border-radius:12px;padding:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);width:180px;text-align:center;transition:all 0.2s}
+.float-wechat{position:fixed;top:16px;left:16px;z-index:999;background:#fff;border:1px solid var(--paper-dark);border-radius:12px;padding:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);width:120px;text-align:center;transition:all 0.2s}
 .float-wechat:hover{box-shadow:0 6px 24px rgba(0,0,0,0.18)}
 .float-wechat p{font-size:11px;color:var(--ink-mid);font-weight:500;line-height:1.4;margin-bottom:8px}
 .float-wechat img{width:100%;border-radius:6px;display:block}
@@ -120,10 +118,10 @@
 
 <div class="main">
   <div class="modes">
-    <button class="mode-btn active" onclick="setMode('sentences')">你老用的句子</button>
-    <button class="mode-btn" onclick="setMode('tongue')">绕口令</button>
-    <button class="mode-btn" onclick="setMode('vocab')">高频词汇</button>
-    <button class="mode-btn" onclick="setMode('free')">到你自己发挥的时候啦</button>
+    <button class="mode-btn active" onclick="setMode('sentences',this)">你老用的句子</button>
+    <button class="mode-btn" onclick="setMode('tongue',this)">绕口令</button>
+    <button class="mode-btn" onclick="setMode('vocab',this)">高频词汇</button>
+    <button class="mode-btn" onclick="setMode('free',this)">到你自己发挥的时候啦</button>
   </div>
 
   <div class="practice-card" id="promptCard">
@@ -140,9 +138,9 @@
     <div class="prompt-phonetic" id="promptPhonetic">/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/</div>
     <div class="prompt-sub" id="promptSub">Focus on the "sh" /ʃ/ vs "s" /s/ distinction. Keep your tongue close to the roof of your mouth for "sh".</div>
     <div class="action-row">
-  <button class="btn-next" onclick="loadNextPrompt()">太难了，跳过 ↻</button>
-  <button class="btn-next" id="hearItBtn" onclick="speakPrompt()">▶ 听贤哥是怎么读的</button>
-</div>
+      <button class="btn-next" onclick="loadNextPrompt()">Next prompt ↻</button>
+      <button class="btn-next" onclick="speakPrompt()">▶ Hear it</button>
+    </div>
   </div>
 
   <div class="mic-section">
@@ -159,17 +157,17 @@
       <div class="wave-bar" style="animation-delay:0.05s"></div>
       <div class="wave-bar" style="animation-delay:0.25s"></div>
     </div>
-    <div class="mic-status" id="micStatus">点麦克风直接说，大声，自信，激情地说</div>
+    <div class="mic-status" id="micStatus">Tap the mic to start recording</div>
     <div class="transcript-box" id="transcriptBox">
-      <span class="transcript-placeholder">你说的都在这呢，同学</span>
+      <span class="transcript-placeholder">Your speech will appear here as you speak...</span>
     </div>
     <button class="analyze-btn" id="analyzeBtn" onclick="analyzeNow()">Analyze my pronunciation</button>
   </div>
 
   <div class="results-card" id="resultsCard">
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('analysis')">Analysis</div>
-      <div class="tab" onclick="switchTab('tips')">Tips</div>
+      <div class="tab active" onclick="switchTab('analysis',this)">Analysis</div>
+      <div class="tab" onclick="switchTab('tips',this)">Tips</div>
     </div>
     <div id="tabAnalysis">
       <div class="score-row" id="scoreRow"></div>
@@ -190,20 +188,17 @@
   </div>
 
   <div class="feedback-section" id="feedbackSection">
-    <div class="card-label">AI coach贤哥 feedback</div>
+    <div class="card-label">AI coach feedback</div>
     <div class="ai-response" id="aiResponse"></div>
     <div class="ai-voice-row">
   <button class="play-btn" id="playFeedbackBtn" onclick="playFeedback()">▶</button>
   <div>
-    <div class="play-label">听听贤哥的评价</div>
+    <div class="play-label">Hear coach feedback</div>
     <div class="play-sub">Natural voice · native accent</div>
   </div>
   <button id="listenSelfBtn" onclick="playMyRecording()" style="display:none;align-items:center;gap:8px;padding:10px 20px;background:var(--gold-dark);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
     🎧 听听我的牛逼回答
   </button>
-     <button id="hearXiangeBtn" onclick="speakPrompt()" style="display:none;align-items:center;gap:8px;padding:10px 20px;background:var(--ink);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:8px;">
-  🔊 听听贤哥是怎么读的
-</button>
       <div style="margin-left:auto">
         <button class="btn-next" onclick="tryAgain()">Try again</button>
       </div>
@@ -215,12 +210,8 @@
   </div>
 </div>
 <div class="float-wechat">
-  <p>客服反馈答疑</p>
+  <p>客服反馈答疑微信</p>
   <img src="F079DDE5BAEB9D7DCA215E45B4F1B0E3.jpg" alt="微信二维码">
- <div style="font-size:10px;color:#C0392B;margin-top:8px;line-height:1.5;text-align:center;word-break:break-all;">
-    网站模型调用：deep seek v4pro
-    语音教练为站长真实人声拟合ai 仅供学习严禁商用 
-  </div>
 </div>
 <script>
 const DB = {
@@ -264,15 +255,13 @@ let currentUtterance=null;
 let mediaRecorder=null;
 let audioChunks=[];
 
-function setMode(m){
+function setMode(m,btn){
   currentMode=m;
   currentIndex=progress[m]||0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
+  btn.classList.add('active');
   document.getElementById('playFeedbackBtn').style.display='';
   document.getElementById('listenSelfBtn').style.display='none';
-  document.getElementById('hearXiangeBtn').style.display='none';
-  document.getElementById('hearItBtn').style.display=m==='free'?'none':'';
   generateAIPrompt();
   resetRecording();
 }
@@ -296,14 +285,6 @@ async function replenishFromAI(count){
   document.getElementById('promptText').textContent='Generating new batch...';
   document.getElementById('promptPhonetic').textContent='';
   document.getElementById('promptSub').textContent='';
-
-  const modeDescriptions={
-    sentences:'natural English sentences for daily conversation or professional use',
-    tongue:'English tongue twisters focusing on difficult sound combinations',
-    vocab:'groups of commonly mispronounced English words on related themes',
-    free:'a natural everyday English sentence for free speaking practice, covering a wide range of topics like life, emotions, work, travel, or opinions',
-  };
-  const levelHint=currentDiff==='all'?'intermediate':currentDiff;
 
   const prompt = `
 You are a professional English pronunciation coach.
@@ -343,9 +324,7 @@ Return ONLY a valid JSON array:
     });
     const data=await res.json();
     const raw=data.content?.[0]?.text||'[]';
-    let cleanRaw=raw.replace(/```json|```/g,'').trim();
-cleanRaw=cleanRaw.replace(/\\"/g,'"');
-const parsed=JSON.parse(cleanRaw);
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
     if(Array.isArray(parsed)&&parsed.length>0){
       DB[currentMode]=parsed;
       try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
@@ -379,7 +358,7 @@ async function generateAIPrompt(){
     sentences:'a natural English sentence for daily conversation or professional use',
     tongue:'an English tongue twister focusing on difficult sound combinations',
     vocab:'a group of 3-4 commonly mispronounced English words on a related theme',
-   free:'natural everyday English sentences for free speaking practice, covering diverse topics like life, emotions, work, travel, or opinions',
+    free:'an open-ended question or topic prompt for free speaking practice'
   };
 
   const levelHint=currentDiff==='all'?'intermediate':currentDiff;
@@ -461,12 +440,9 @@ Only output when all conditions are satisfied.
     let parsed = null;
 
     // ✅ 1. 尝试直接解析
-try{
-  parsed = JSON.parse(raw);
-}catch(e){
-  // 处理转义引号
-  const cleaned = raw.replace(/\\"/g,'"').replace(/"{2,}/g,'"');
-  try{parsed = JSON.parse(cleaned);}catch(e2){}
+    try{
+      parsed = JSON.parse(raw);
+    }catch(e){
       // ✅ 2. 尝试从文本中提取 JSON
       const match = raw.match(/\{[\s\S]*\}/);
       if(match){
@@ -477,12 +453,8 @@ try{
     }
 
     // ✅ 3. 如果成功解析
-if(parsed && parsed.text){
-  if(parsed.text.toLowerCase().includes('though')&&Math.random()<0.6){
-    generateAIPrompt();
-    return;
-  }
-  document.getElementById('promptText').textContent = parsed.text;
+    if(parsed && parsed.text){
+      document.getElementById('promptText').textContent = parsed.text;
       document.getElementById('promptPhonetic').textContent = parsed.phonetic || '';
       document.getElementById('promptSub').textContent = parsed.sub || '';
     }
@@ -510,7 +482,6 @@ function loadNextPrompt(){
   const arr=getFilteredPrompts();
   const total=arr.length;
   currentIndex++;
-  window._lastAudioURL=null;
   if(currentIndex>=total){
     currentIndex=0;
     progress[currentMode]=0;
@@ -531,7 +502,7 @@ function hideResults(){
 
 function resetRecording(){
   transcript='';
-  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">你说的都在这呢，同学</span>';
+  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">Your speech will appear here as you speak...</span>';
   document.getElementById('analyzeBtn').classList.remove('visible');
   hideResults();
   if(isRecording) stopRecording();
@@ -739,30 +710,28 @@ function getTip(target,spoken){
   return `Break it into syllables and practice slowly: ${target.split('').join('-·-').replace(/-·-/g,'')}.`;
 }
 
-function switchTab(tab){
+function switchTab(tab,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
+  el.classList.add('active');
   document.getElementById('tabAnalysis').className=tab==='analysis'?'':'section-hidden';
   document.getElementById('tabTips').className=tab==='tips'?'':'section-hidden';
 }
 
 async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
  // 自由表达模式不显示AI反馈，改为播放录音
-if(currentMode==='free'){
+  if(currentMode==='free'){
     document.getElementById('feedbackSection').classList.add('visible');
     document.getElementById('aiResponse').innerHTML='';
     document.getElementById('playFeedbackBtn').style.display='none';
-    document.getElementById('hearItBtn').style.display='none';
-    document.getElementById('listenSelfBtn').style.display=window._lastAudioURL?'flex':'none';
-    document.getElementById('hearXiangeBtn').style.display=window._lastAudioURL?'flex':'none';
+    document.getElementById('listenSelfBtn').style.display='flex';
     return;
   }
   document.getElementById('feedbackSection').classList.add('visible');
-  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">贤哥正在点评中</span>';
+  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">正在生成教练反馈</span>';
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
   const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
 
- const prompt=`你是一位严厉、高要求的英语发音教练，名叫贤哥。学员刚刚练习了以下内容：
+ const prompt=`你是一位严厉、高要求的英语发音教练。学员刚刚练习了以下内容：
 
 目标句子："${target}"
 学员说的："${spoken}"
@@ -813,7 +782,6 @@ function tryAgain(){resetRecording()}
 if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
   document.getElementById('noSupport').style.display='block';
 }
-  document.getElementById('hearItBtn').style.display=currentMode==='free'?'none':'';
 currentIndex=progress[currentMode]||0;
 generateAIPrompt();
 setTimeout(()=>{voices=synth.getVoices()},500);
