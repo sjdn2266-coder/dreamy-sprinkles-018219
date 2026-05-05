@@ -564,7 +564,16 @@ function startRecording(){
     stopRecording();
   };
   recognition.onend=()=>{if(isRecording) recognition.start()};
-  recognition.start();
+  // 录音保存
+let mediaRecorder=null;
+let audioChunks=[];
+navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+  mediaRecorder=new MediaRecorder(stream);
+  audioChunks=[];
+  mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+  mediaRecorder.start();
+}).catch(e=>{});
+ recognition.start();
   isRecording=true;
   document.getElementById('micBtn').className='mic-btn recording';
   document.getElementById('micBtn').textContent='⏹';
