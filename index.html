@@ -334,7 +334,9 @@ Return ONLY a valid JSON array:
     });
     const data=await res.json();
     const raw=data.content?.[0]?.text||'[]';
-    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    let cleanRaw=raw.replace(/```json|```/g,'').trim();
+cleanRaw=cleanRaw.replace(/\\"/g,'"');
+const parsed=JSON.parse(cleanRaw);
     if(Array.isArray(parsed)&&parsed.length>0){
       DB[currentMode]=parsed;
       try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
