@@ -260,6 +260,8 @@ function setMode(m){
   currentIndex=progress[m]||0;
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
+  document.getElementById('playFeedbackBtn').style.display='';
+  document.getElementById('listenSelfBtn').style.display='none';
   generateAIPrompt();
   resetRecording();
 }
