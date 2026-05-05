@@ -450,9 +450,12 @@ Only output when all conditions are satisfied.
     let parsed = null;
 
     // ✅ 1. 尝试直接解析
-    try{
-      parsed = JSON.parse(raw);
-    }catch(e){
+try{
+  parsed = JSON.parse(raw);
+}catch(e){
+  // 处理转义引号
+  const cleaned = raw.replace(/\\"/g,'"').replace(/"{2,}/g,'"');
+  try{parsed = JSON.parse(cleaned);}catch(e2){}
       // ✅ 2. 尝试从文本中提取 JSON
       const match = raw.match(/\{[\s\S]*\}/);
       if(match){
