@@ -267,6 +267,8 @@ function setMode(m){
   event.target.classList.add('active');
   document.getElementById('playFeedbackBtn').style.display='';
   document.getElementById('listenSelfBtn').style.display='none';
+  document.getElementById('hearXiangeBtn').style.display='none';
+  document.getElementById('hearItBtn').style.display='';
   generateAIPrompt();
   resetRecording();
 }
