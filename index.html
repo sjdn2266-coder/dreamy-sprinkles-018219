@@ -771,6 +771,14 @@ function playFeedback(){
   speakText(feedbackText,'en-US',0.9);
   setTimeout(()=>{btn.classList.remove('playing');btn.textContent='▶'},500);
 }
+function playMyRecording(){
+  if(!window._lastAudioURL){
+    alert('没有找到录音，请重新录制');
+    return;
+  }
+  const audio=new Audio(window._lastAudioURL);
+  audio.play();
+}
 
 function tryAgain(){resetRecording()}
 
