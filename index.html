@@ -809,6 +809,7 @@ function tryAgain(){resetRecording()}
 if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
   document.getElementById('noSupport').style.display='block';
 }
+  document.getElementById('hearItBtn').style.display=currentMode==='free'?'none':'';
 currentIndex=progress[currentMode]||0;
 generateAIPrompt();
 setTimeout(()=>{voices=synth.getVoices()},500);
