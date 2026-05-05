@@ -161,7 +161,7 @@
     </div>
     <div class="mic-status" id="micStatus">Tap the mic to start recording</div>
     <div class="transcript-box" id="transcriptBox">
-      <span class="transcript-placeholder">Your speech will appear here as you speak...</span>
+      <span class="transcript-placeholder">你说的都在这呢，同学</span>
     </div>
     <button class="analyze-btn" id="analyzeBtn" onclick="analyzeNow()">Analyze my pronunciation</button>
   </div>
@@ -527,7 +527,7 @@ function hideResults(){
 
 function resetRecording(){
   transcript='';
-  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">Your speech will appear here as you speak...</span>';
+  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">你说的都在这呢，同学</span>';
   document.getElementById('analyzeBtn').classList.remove('visible');
   hideResults();
   if(isRecording) stopRecording();
