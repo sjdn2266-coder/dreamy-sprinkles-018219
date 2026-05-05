@@ -254,6 +254,8 @@ let feedbackText='';
 let synth=window.speechSynthesis;
 let voices=[];
 let currentUtterance=null;
+let mediaRecorder=null;
+let audioChunks=[];
 
 function setMode(m){
   currentMode=m;
@@ -570,9 +572,7 @@ function startRecording(){
   };
   recognition.onend=()=>{if(isRecording) recognition.start()};
   // 录音保存
-let mediaRecorder=null;
-let audioChunks=[];
-navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
   mediaRecorder=new MediaRecorder(stream);
   audioChunks=[];
   mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
