@@ -741,11 +741,13 @@ function switchTab(tab){
 
 async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
  // 自由表达模式不显示AI反馈，改为播放录音
-  if(currentMode==='free'){
+ if(currentMode==='free'){
     document.getElementById('feedbackSection').classList.add('visible');
     document.getElementById('aiResponse').innerHTML='';
     document.getElementById('playFeedbackBtn').style.display='none';
     document.getElementById('listenSelfBtn').style.display='flex';
+    document.getElementById('hearXiangeBtn').style.display='flex';
+    document.getElementById('hearItBtn').style.display='none';
     return;
   }
   document.getElementById('feedbackSection').classList.add('visible');
