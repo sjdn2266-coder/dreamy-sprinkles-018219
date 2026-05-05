@@ -702,8 +702,7 @@ function switchTab(tab){
 
 async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
   document.getElementById('feedbackSection').classList.add('visible');
-  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">Generating coach feedback</span>';
-
+  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">正在生成教练反馈</span>';
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
   const errorList=errors.map(w=>`"${w.target}" said as "${w.spoken||'(missing)'}"`).join(', ');
 
