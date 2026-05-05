@@ -718,6 +718,14 @@ function switchTab(tab){
 }
 
 async function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
+ // 自由表达模式不显示AI反馈，改为播放录音
+  if(currentMode==='free'){
+    document.getElementById('feedbackSection').classList.add('visible');
+    document.getElementById('aiResponse').innerHTML='';
+    document.getElementById('playFeedbackBtn').style.display='none';
+    document.getElementById('listenSelfBtn').style.display='flex';
+    return;
+  }
   document.getElementById('feedbackSection').classList.add('visible');
   document.getElementById('aiResponse').innerHTML='<span class="loading-dots">正在生成教练反馈</span>';
   const errors=alignment.filter(w=>w.status==='err'||w.status==='warn');
