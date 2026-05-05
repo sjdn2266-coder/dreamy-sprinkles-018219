@@ -584,6 +584,13 @@ navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
 function stopRecording(){
   if(recognition){recognition.stop();recognition=null}
   isRecording=false;
+  if(mediaRecorder&&mediaRecorder.state!=='inactive'){
+  mediaRecorder.stop();
+  mediaRecorder.onstop=()=>{
+    const blob=new Blob(audioChunks,{type:'audio/webm'});
+    window._lastAudioURL=URL.createObjectURL(blob);
+  };
+}
   document.getElementById('micBtn').className='mic-btn idle';
   document.getElementById('micBtn').textContent='🎙';
   document.getElementById('micStatus').textContent='Tap the mic to record again';
