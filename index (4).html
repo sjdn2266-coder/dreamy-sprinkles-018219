@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --gold:#C9A84C;--gold-light:#F0D98B;--gold-dark:#8B6914;
+    --ink:#1a1a1a;--ink-mid:#444;--ink-light:#888;
+    --paper:#FDFBF7;--paper-mid:#F5F0E8;--paper-dark:#EDE5D4;
+    --red:#C0392B;--green:#1a6b3c;--blue:#1a4a8b;
+    --shadow:0 2px 20px rgba(0,0,0,0.08);
+    --radius:12px;
+  }
+  body{font-family:'DM Sans','Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+  .header{text-align:center;padding:2.5rem 1rem 1.5rem;border-bottom:1px solid var(--paper-dark);background:-webkit-linear-gradient(top,#FFF9EE 0%,var(--paper) 100%);background:linear-gradient(180deg,#FFF9EE 0%,var(--paper) 100%)}
+  .header h1{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--ink);letter-spacing:-0.5px;line-height:1.1}
+  .header h1 span{color:var(--gold-dark);font-style:italic}
+  .header p{color:var(--ink-light);font-size:0.9rem;margin-top:0.4rem;font-weight:300}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--paper-dark);border:1px solid var(--gold-light);color:var(--gold-dark);font-size:11px;padding:4px 10px;border-radius:20px;margin-top:0.6rem;font-weight:500}
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);-webkit-animation:pulse 2s infinite;animation:pulse 2s infinite}
+  @-webkit-keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .main{max-width:780px;margin:0 auto;padding:1.5rem 1rem 3rem}
+  .modes{display:-webkit-flex;display:flex;gap:8px;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .mode-btn{-webkit-flex:none;flex:none;padding:8px 16px;border-radius:20px;border:1px solid var(--paper-dark);background:var(--paper);color:var(--ink-mid);font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans','Noto Sans SC',sans-serif;white-space:nowrap;touch-action:manipulation}
+  .mode-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .mode-btn:hover:not(.active){background:var(--paper-mid)}
+  .practice-card{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+  .card-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--gold-dark);margin-bottom:0.6rem}
+  .prompt-text{font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.5;color:var(--ink);margin-bottom:0.5rem}
+  .prompt-sub{font-size:13px;color:var(--ink-light);line-height:1.6}
+  .prompt-phonetic{font-size:13px;color:var(--blue);margin-top:0.4rem;font-style:italic}
+  .prompt-chinese{font-size:14px;color:var(--ink-mid);margin-top:0.2rem;line-height:1.6}
+  .action-row{display:-webkit-flex;display:flex;align-items:center;gap:12px;margin-top:1rem}
+  .btn-next{background:none;border:1px solid var(--paper-dark);color:var(--ink-mid);font-size:13px;padding:8px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans','Noto Sans SC',sans-serif;transition:all 0.2s;touch-action:manipulation}
+  .btn-next:hover{background:var(--paper-mid)}
+  .mic-section{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;align-items:center;padding:2rem 1rem;background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow)}
+  .mic-ring{position:relative;width:96px;height:96px;cursor:pointer;margin-bottom:1rem}
+  .mic-ring svg{width:96px;height:96px;position:absolute;top:0;left:0}
+  .ring-bg{fill:none;stroke:var(--paper-dark);stroke-width:2}
+  .ring-prog{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 0.3s;-webkit-transform-origin:center;transform-origin:center;-webkit-transform:rotate(-90deg);transform:rotate(-90deg)}
+  .mic-btn{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;display:-webkit-flex;display:flex;align-items:center;justify-content:center;font-size:28px;transition:all 0.2s;background:var(--paper-mid);-webkit-tap-highlight-color:transparent}
+  .mic-btn.idle{background:var(--paper-mid);box-shadow:0 0 0 0 rgba(201,168,76,0)}
+  .mic-btn.recording{background:#C0392B;-webkit-animation:recpulse 1.5s infinite;animation:recpulse 1.5s infinite;box-shadow:0 0 0 8px rgba(192,57,43,0.15)}
+  @-webkit-keyframes recpulse{0%,100%{box-shadow:0 0 0 8px rgba(192,57,43,0.1)}50%{box-shadow:0 0 0 16px rgba(192,57,43,0.05)}}
+  @keyframes recpulse{0%,100%{box-shadow:0 0 0 8px rgba(192,57,43,0.1)}50%{box-shadow:0 0 0 16px rgba(192,57,43,0.05)}}
+  .mic-status{font-size:13px;color:var(--ink-light);font-weight:300}
+  .waveform{display:-webkit-flex;display:flex;align-items:center;gap:3px;height:36px;margin:0.5rem 0;opacity:0;transition:opacity 0.3s}
+  .waveform.active{opacity:1}
+  .wave-bar{width:3px;border-radius:3px;background:var(--gold);-webkit-animation:wave 0.8s ease-in-out infinite;animation:wave 0.8s ease-in-out infinite;min-height:4px}
+  @-webkit-keyframes wave{0%,100%{height:4px}50%{height:28px}}
+  @keyframes wave{0%,100%{height:4px}50%{height:28px}}
+  .transcript-box{width:100%;background:var(--paper-mid);border:1px solid var(--paper-dark);border-radius:8px;padding:1rem;min-height:60px;font-size:15px;line-height:1.7;color:var(--ink);margin-top:1rem;font-style:italic}
+  .transcript-placeholder{color:var(--ink-light);font-style:normal;font-size:13px}
+  .analyze-btn{margin-top:1rem;padding:12px 32px;background:var(--ink);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans','Noto Sans SC',sans-serif;transition:all 0.2s;display:none;touch-action:manipulation}
+  .analyze-btn:hover{background:#333}
+  .analyze-btn.visible{display:block}
+  .results-card{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);display:none}
+  .results-card.visible{display:block}
+  .score-row{display:-webkit-flex;display:flex;gap:12px;margin-bottom:1.2rem;flex-wrap:wrap}
+  .score-chip{-webkit-flex:1;flex:1;min-width:80px;text-align:center;background:var(--paper-mid);border-radius:8px;padding:0.8rem 0.5rem}
+  .score-num{font-family:'DM Serif Display',serif;font-size:1.8rem;line-height:1}
+  .score-num.good{color:var(--green)}
+  .score-num.ok{color:var(--gold-dark)}
+  .score-num.poor{color:var(--red)}
+  .score-label{font-size:11px;color:var(--ink-light);margin-top:4px}
+  .comparison{margin:1rem 0}
+  .comp-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);margin-bottom:6px}
+  .comp-line{display:-webkit-flex;display:flex;flex-wrap:wrap;gap:4px;line-height:2;font-size:15px}
+  .word-ok{color:var(--green);border-bottom:2px solid var(--green);padding:1px 0}
+  .word-warn{color:var(--gold-dark);border-bottom:2px solid var(--gold);padding:1px 0;background:rgba(240,217,139,0.15);border-radius:2px}
+  .word-err{color:var(--red);border-bottom:2px solid var(--red);padding:1px 0;background:rgba(192,57,43,0.08);border-radius:2px;cursor:help}
+  .word-miss{color:var(--ink-light);opacity:0.4;text-decoration:line-through}
+  .legend{display:-webkit-flex;display:flex;gap:16px;flex-wrap:wrap;margin-top:0.8rem}
+  .legend-item{display:-webkit-flex;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-light)}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+  .tips-list{list-style:none;margin-top:1rem}
+  .tip-item{display:-webkit-flex;display:flex;gap:10px;padding:0.6rem 0;border-top:1px solid var(--paper-mid);font-size:14px;line-height:1.5}
+  .tip-icon{flex:none;width:20px;height:20px;border-radius:50%;display:-webkit-flex;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+  .tip-icon.warn{background:rgba(240,217,139,0.4);color:var(--gold-dark)}
+  .tip-icon.err{background:rgba(192,57,43,0.1);color:var(--red)}
+  .feedback-section{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);display:none}
+  .feedback-section.visible{display:block}
+  .ai-voice-row{display:-webkit-flex;display:flex;align-items:center;gap:12px;margin-top:1rem}
+  .play-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--paper-dark);background:var(--paper-mid);cursor:pointer;display:-webkit-flex;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;flex:none}
+  .play-btn:hover{background:var(--paper-dark)}
+  .play-btn.playing{background:var(--gold-dark);color:#fff;border-color:var(--gold-dark)}
+  .play-label{font-size:13px;color:var(--ink-mid)}
+  .play-sub{font-size:12px;color:var(--ink-light)}
+  .ai-response{font-size:14px;line-height:1.8;color:var(--ink-mid);margin-top:1rem;padding:1rem;background:var(--paper-mid);border-radius:8px;border-left:3px solid var(--gold)}
+  .loading-dots::after{content:'';-webkit-animation:dots 1.5s infinite;animation:dots 1.5s infinite}
+  @-webkit-keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+  @keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+  .no-support{text-align:center;padding:2rem;color:var(--red);font-size:14px;background:rgba(192,57,43,0.05);border-radius:8px;border:1px solid rgba(192,57,43,0.2)}
+  .tabs{display:-webkit-flex;display:flex;border-bottom:1px solid var(--paper-dark);margin-bottom:1.2rem;gap:0}
+  .tab{padding:8px 16px;font-size:13px;color:var(--ink-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+  .tab.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+  .section-hidden{display:none}
+  .progress-wrap{background:#fff;border:1px solid var(--paper-dark);border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+  .progress-header{display:-webkit-flex;display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
+  .progress-title{font-size:12px;font-weight:500;color:var(--ink-mid)}
+  .progress-nums{font-size:12px;color:var(--ink-light)}
+  .progress-bar{height:6px;background:var(--paper-dark);border-radius:6px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--gold);border-radius:6px;transition:width 0.4s ease}
+  .progress-reset{font-size:11px;color:var(--ink-light);cursor:pointer;text-decoration:underline;margin-top:0.4rem;display:inline-block}
+  .progress-reset:hover{color:var(--red)}
+  .float-wechat{position:fixed;top:16px;left:16px;z-index:999;background:#fff;border:1px solid var(--paper-dark);border-radius:12px;padding:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);width:180px;text-align:center;transition:all 0.2s}
+  .float-wechat:hover{box-shadow:0 6px 24px rgba(0,0,0,0.18)}
+  .float-wechat p{font-size:11px;color:var(--ink-mid);font-weight:500;line-height:1.4;margin-bottom:8px}
+  .float-wechat img{width:100%;border-radius:6px;display:block}
+  .float-wechat .qr-notice{font-size:9px;color:var(--red);line-height:1.5;margin-top:6px;text-align:center;font-weight:500}
+  .float-close{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;border:none;font-size:14px;line-height:1;cursor:pointer;z-index:1000;display:-webkit-flex;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all 0.2s;-webkit-tap-highlight-color:transparent;padding:0}
+  .float-close:hover{background:var(--red);-webkit-transform:scale(1.1);transform:scale(1.1)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>贤哥<span>流利说</span></h1>
+  <p>AI驱动的英语发音教练</p>
+  <div class="badge">实时分析 · 母语级语音反馈</div>
+</div>
+
+<div class="main">
+  <div class="modes">
+    <button class="mode-btn active" onclick="setMode('sentences',this)">你老用的句子</button>
+    <button class="mode-btn" onclick="setMode('tongue',this)">绕口令</button>
+    <button class="mode-btn" onclick="setMode('vocab',this)">高频词汇</button>
+    <button class="mode-btn" onclick="setMode('free',this)">到你自己发挥的时候啦</button>
+  </div>
+
+  <div class="practice-card" id="promptCard">
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-title" id="progressTitle">句子 · 进度</span>
+        <span class="progress-nums" id="progressNums">0 / 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-reset" onclick="resetProgress()">重置进度</span>
+    </div>
+    <div class="card-label">练习提示</div>
+    <div class="prompt-text" id="promptText">She sells seashells by the seashore.</div>
+    <div class="prompt-chinese" id="promptChinese"></div>
+    <div class="prompt-phonetic" id="promptPhonetic">/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/</div>
+    <div class="prompt-sub" id="promptSub">注意 'sh' /ʃ/ 和 's' /s/ 的区别，发'sh'时舌头靠近上颚</div>
+    <div class="action-row">
+      <button class="btn-next" onclick="loadNextPrompt()">下一题 ↻</button>
+      <button class="btn-next" id="hearItBtn" onclick="speakPrompt()">▶ 试听</button>
+    </div>
+  </div>
+
+  <div class="mic-section">
+    <div class="mic-ring" onclick="toggleRecording()" id="micRing">
+      <svg viewBox="0 0 96 96"><circle class="ring-bg" cx="48" cy="48" r="45"/><circle class="ring-prog" id="ringProg" cx="48" cy="48" r="45"/></svg>
+      <button class="mic-btn idle" id="micBtn">🎙</button>
+    </div>
+    <div class="waveform" id="waveform">
+      <div class="wave-bar" style="animation-delay:0s"></div>
+      <div class="wave-bar" style="animation-delay:0.1s"></div>
+      <div class="wave-bar" style="animation-delay:0.2s"></div>
+      <div class="wave-bar" style="animation-delay:0.3s"></div>
+      <div class="wave-bar" style="animation-delay:0.15s"></div>
+      <div class="wave-bar" style="animation-delay:0.05s"></div>
+      <div class="wave-bar" style="animation-delay:0.25s"></div>
+    </div>
+    <div class="mic-status" id="micStatus">点击麦克风开始录音</div>
+    <div class="transcript-box" id="transcriptBox">
+      <span class="transcript-placeholder">你的语音将在这里实时显示...</span>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeNow()">分析我的发音</button>
+  </div>
+
+  <div class="results-card" id="resultsCard">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('analysis',this)">分析</div>
+      <div class="tab" onclick="switchTab('tips',this)">建议</div>
+    </div>
+    <div id="tabAnalysis">
+      <div class="score-row" id="scoreRow"></div>
+      <div class="comparison">
+        <div class="comp-label">逐词分析</div>
+        <div class="comp-line" id="wordBreakdown"></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>正确</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>需改进</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>错误</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--ink-light)"></div>遗漏</div>
+        </div>
+      </div>
+    </div>
+    <div id="tabTips" class="section-hidden">
+      <ul class="tips-list" id="tipsList"></ul>
+    </div>
+  </div>
+
+  <div class="feedback-section" id="feedbackSection">
+    <div class="card-label">AI教练反馈</div>
+    <div class="ai-response" id="aiResponse"></div>
+    <div class="ai-voice-row">
+      <button class="play-btn" id="playFeedbackBtn" onclick="playFeedback()">▶</button>
+      <div>
+        <div class="play-label">听取教练反馈</div>
+        <div class="play-sub">自然语音 · 母语口音</div>
+      </div>
+      <button id="listenSelfBtn" onclick="playMyRecording()" style="display:none;align-items:center;gap:8px;padding:10px 20px;background:var(--gold-dark);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans','Noto Sans SC',sans-serif;">
+        🎧 听听我的回答
+      </button>
+      <button id="hearPromptBtn" onclick="speakPrompt()" style="display:none;align-items:center;gap:8px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:25px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans','Noto Sans SC',sans-serif;">
+        🔊 试听例句
+      </button>
+      <div style="margin-left:auto">
+        <button class="btn-next" onclick="tryAgain()">再来一次</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-support" id="noSupport" style="display:none">
+    您的浏览器不支持语音识别功能。请尝试使用以下浏览器：Chrome、Edge、Safari（需打开"语音识别"权限）、或夸克/百度浏览器（需授予麦克风权限）。如仍不可用，可使用手机自带的语音输入法进行练习。
+  </div>
+</div>
+
+<div class="float-wechat" id="floatWechat">
+  <button class="float-close" onclick="document.getElementById('floatWechat').style.display='none'" title="关闭">✕</button>
+  <p>客服反馈答疑微信</p>
+  <img src="F079DDE5BAEB9D7DCA215E45B4F1B0E3.jpg" alt="微信二维码">
+  <div class="qr-notice">模型调用deep seek v4 pro<br>语音教练为站长真实人声拟合<br>仅供学习严禁商用</div>
+</div>
+
+<script>
+var DB = {
+  sentences:[
+    {text:"She sells seashells by the seashore.",chinese:"她在海边摆摊卖贝壳。",phonetic:"/ʃiː sɛlz ˈsiːʃɛlz baɪ ðə ˈsiːʃɔːr/",sub:"注意 'sh' /ʃ/ 和 's' /s/ 的区别，发'sh'时舌头靠近上颚"},
+    {text:"The weather in Edinburgh is rather unpredictable.",chinese:"爱丁堡的天说变就变。",phonetic:"/ðə ˈwɛðər ɪn ˈɛdɪnbrə ɪz ˈrɑːðər ʌnprɪˈdɪktəbl/",sub:"练习 'th' /ð/ 发音，舌尖轻触上齿"},
+    {text:"I thought thoroughly about the theory.",chinese:"我把这个理论翻来覆去琢磨了个透。",phonetic:"/aɪ θɔːt ˈθɜːrəli əˈbaʊt ðə ˈθɪəri/",sub:"两种 'th' 音：/θ/ 清辅音和 /ð/ 浊辅音，舌尖均需接触牙齿"},
+    {text:"Could you please pass me the butter?",chinese:"麻烦把黄油递我一下？",phonetic:"/kʊd juː pliːz pɑːs miː ðə ˈbʌtər/",sub:"注意连读：'could you' 可读作 /kʊdʒə/，'butter' 中的 't' 在美式英语中为闪音"},
+    {text:"I would have gone if I had known.",chinese:"早知道我就去了。",phonetic:"/aɪ wʊd həv ɡɒn ɪf aɪ həd nəʊn/",sub:"练习虚拟语气的自然节奏，'have' 弱读为 /həv/"},
+  ],
+  tongue:[
+    {text:"How much wood would a woodchuck chuck?",chinese:"一只土拨鼠能抛多少根木头？",phonetic:"/haʊ mʌtʃ wʊd wʊd ə ˈwʊdtʃʌk tʃʌk/",sub:"/w/ 音：双唇收圆，声带振动，试试3倍速"},
+    {text:"Red lorry, yellow lorry, red lorry, yellow lorry.",chinese:"红的卡车黄的卡车，红的黄的来回倒。",phonetic:"/rɛd ˈlɒri ˈjɛloʊ ˈlɒri/",sub:"交替练习 /r/ 和 /l/，这是最常混淆的两个辅音"},
+    {text:"Unique New York, unique New York, you know you need unique New York.",chinese:"别致纽约，别致纽约，你得去一趟那别致的纽约。",phonetic:"/juːˈniːk njuː jɔːk/",sub:"/juː/ 音需舌根抬高接近上颚，反复快速练习"},
+  ],
+  vocab:[
+    {text:"Particularly, specifically, and simultaneously.",chinese:"特别是、具体来说、与此同时。",phonetic:"/pəˈtɪkjʊləli speˈsɪfɪkli ænd saɪˌmʌlˈteɪniəsli/",sub:"多音节副词重音模式：par-TIC-u-lar-ly, si-mul-TA-ne-ous-ly"},
+    {text:"Entrepreneur, bureaucracy, phenomenon.",chinese:"创业者、官样文章、奇观。",phonetic:"/ˌɒntrəprəˈnɜːr bjʊˈrɒkrəsi fɪˈnɒmɪnən/",sub:"易读错词汇，'entrepreneur' 源自法语，'r' 发音不省略"},
+    {text:"February, library, comfortable, temperature.",chinese:"二月、书房、舒坦的、气温。",phonetic:"/ˈfebruəri ˈlaɪbrəri ˈkʌmftəbl ˈtɛmprɪtʃər/",sub:"日常口语中常被省略字母的词汇，尝试正式和随意两种读法"},
+  ],
+  free:[
+    {text:"Tell me about your weekend plans.",chinese:"聊聊你这周末打算怎么过？",phonetic:"Free response — aim for natural fluency",sub:"自由表达30-60秒，重点关注语调、节奏和自然连读"},
+    {text:"Describe your favorite place in the world.",chinese:"说说这世上最让你心驰神往的地方。",phonetic:"Free response — aim for natural fluency",sub:"使用生动的形容词，变化句子长度，别忘了句子重音"},
+    {text:"What's something you've learned recently?",chinese:"你最近有什么新的收获？",phonetic:"Free response — aim for natural fluency",sub:"练习组织思路：观点、理由、例子；使用过渡短语"},
+  ]
+};
+
+var currentMode='sentences';
+var currentIndex=0;
+var progress={sentences:0,tongue:0,vocab:0,free:0};
+var currentDiff='all';
+try{var s=localStorage.getItem('sf_progress');if(s)progress=JSON.parse(s);}catch(e){}
+try{['sentences','tongue','vocab','free'].forEach(function(m){var saved=localStorage.getItem('sf_db_'+m);if(saved){var p=JSON.parse(saved);if(Array.isArray(p)&&p.length>0)DB[m]=p;}});}catch(e){}
+var recognition=null;
+var isRecording=false;
+var transcript='';
+var feedbackText='';
+var synth=window.speechSynthesis;
+var ttsAvailable=false;
+var ttsTested=false;
+var voices=[];
+var currentUtterance=null;
+var mediaRecorder=null;
+var audioChunks=[];
+var recordTimer=null;
+var recordStartTime=0;
+var speechAPI=!!('webkitSpeechRecognition' in window||'SpeechRecognition' in window);
+
+function fetchTimeout(url,opts,ms){
+  return new Promise(function(resolve,reject){
+    var tid=setTimeout(function(){reject(new Error('timeout'))},ms||12000);
+    fetch(url,opts).then(function(r){clearTimeout(tid);resolve(r)},function(e){clearTimeout(tid);reject(e)});
+  });
+}
+
+function setMode(m,btn){
+  currentMode=m;
+  currentIndex=progress[m]||0;
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  document.getElementById('playFeedbackBtn').style.display='';
+  document.getElementById('listenSelfBtn').style.display='none';
+  document.getElementById('hearPromptBtn').style.display='none';
+  document.getElementById('hearItBtn').style.display=m==='free'?'none':'';
+  generateAIPrompt();
+  resetRecording();
+}
+
+function updateProgressBar(){
+  var arr=getFilteredPrompts();
+  var total=arr.length;
+  var done=Math.min(currentIndex,total);
+  var modeNames={sentences:'句子',tongue:'绕口令',vocab:'词汇',free:'自由'};
+  document.getElementById('progressTitle').textContent=modeNames[currentMode]+' · 进度';
+  document.getElementById('progressNums').textContent=done+' / '+total;
+  document.getElementById('progressFill').style.width=(total?Math.round(done/total*100):0)+'%';
+}
+
+function getFilteredPrompts(){
+  var arr=DB[currentMode];
+  if(currentDiff==='all') return arr;
+  return arr.filter(function(p){return p.level===currentDiff});
+}
+
+function loadPrompt(idx){
+  currentIndex=idx;
+  var arr=getFilteredPrompts();
+  var p=arr[idx%arr.length];
+  document.getElementById('promptText').textContent=p.text;
+  document.getElementById('promptChinese').textContent=p.chinese||'';
+  document.getElementById('promptPhonetic').textContent=p.phonetic;
+  document.getElementById('promptSub').textContent=p.sub;
+  updateProgressBar();
+}
+
+function replenishFromAI(count){
+  document.getElementById('promptText').textContent='正在生成新题目...';
+  document.getElementById('promptChinese').textContent='';
+  document.getElementById('promptPhonetic').textContent='';
+  document.getElementById('promptSub').textContent='';
+
+  var isVocabR=currentMode==='vocab';
+  var isTongueR=currentMode==='tongue';
+
+  var vocabInstructionR=isVocabR
+? "词汇模式关键指示：\n- 只输出用逗号分隔的独立单词——绝对不要输出句子\n- 每项的\"text\"字段必须是逗号分隔的单词，例如\"comfortable, vegetable, temperature, chocolate\"\n- 不要写如\"I bought chocolate at the store\"这样的完整句子\n- 按主题每组4-5个单词\n"
+: "";
+
+  var tongueInstructionR=isTongueR
+? "绕口令关键指示：\n- 每句必须是真正的绕口令，快速朗读时绕口\n- 同一难发音必须在句中密集出现4次以上\n- 参考：\"Peter Piper picked a peck of pickled peppers\"\n- 如果母语者3倍速朗读不会打结，就不算绕口令——重写\n\n关键——多样性：每个绕口令必须针对完全不同的发音。轮换使用：/p/ vs /b/、/s/ vs /ʃ/、/r/ vs /l/、/θ/ vs /ð/、/v/ vs /w/、/tʃ/ vs /dʒ/、辅音簇（str, spr, spl）、多音节快速连读、元音区分。绝不要生成两个针对相同发音模式的绕口令。每个都必须有全新的感觉。\n"
+: "";
+
+  var modeLabel=isVocabR?'词汇串（非句子）':isTongueR?'真正的绕口令':'句子';
+  var requirementsLine=isVocabR
+?'- 每项是一条逗号分隔的4-5个独立单词——不是句子\n- 单词应按相关主题分组'
+:'- 每句必须包含至少一种发音挑战（th, r, l, 辅音簇, 或连读）';
+  var extraLine=isVocabR?'——选择难的、常读错的单词':'';
+
+  var diversityRules=isVocabR
+? "- 每项的主题必须与批次中其他项完全不同\n"
+: "- 每项必须来自与其他所有项完全不同的领域——绝不重复话题、动作或场景\n- 每句必须在话题、动词、动作、场景、主题上与其他所有项完全不同\n- 想象每句话来自完全不同的人、地点和人生场景\n- 例如：一句关于烹饪、一句关于旅行、一句关于科技、一句关于情感、一句关于自然——绝不要有两个来自同一领域\n- 避免过度使用\"though\"——每5句中最多使用1次\n";
+
+  var prompt = "你是一位专业的英语发音教练。\n\n"+
+"请生成"+count+"道高质量的英语口语练习题目。\n"+
+"模式："+modeLabel+"\n\n"+
+vocabInstructionR+
+tongueInstructionR+
+"要求：\n"+
+"- 自然、真实的英语口语\n"+
+"- 中等难度（不太简单也不太困难）\n"+
+requirementsLine+"\n"+
+"- 避免简单或千篇一律的内容"+extraLine+"\n"+
+"- chinese字段必须用地道汉语意译，杜绝逐词硬翻，读起来要自然\n"+
+diversityRules+
+"- 必须在话题、词汇和结构上与最近这些题目完全不同："+DB[currentMode].slice(-5).map(function(p){return p.text}).join(' | ')+"\n"+
+"- 如果两项有任何相似之处，替换其中一项再输出\n"+
+"- 不要解释、不要额外文字\n\n"+
+"只返回有效的JSON数组：\n\n"+
+"[\n"+
+"  {\"text\":\"...\",\"chinese\":\"地道中文翻译，切忌逐词硬译，要符合汉语口语习惯\",\"phonetic\":\"IPA音标\",\"sub\":\"一句中文发音提示\"},\n"+
+"  ...\n"+
+"]";
+  fetchTimeout('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:4000,
+      messages:[{role:'user',content:prompt}]
+    })
+  }).then(function(res){return res.json()}).then(function(data){
+    var raw=(data&&data.content&&data.content[0]&&data.content[0].text)||'[]';
+    var parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    if(Array.isArray(parsed)&&parsed.length>0){
+      DB[currentMode]=parsed;
+      try{localStorage.setItem('sf_db_'+currentMode,JSON.stringify(parsed));}catch(e){}
+      loadPrompt(0);
+    } else {
+      generateAIPrompt();
+    }
+  }).catch(function(e){
+    generateAIPrompt();
+  });
+  updateProgressBar();
+}
+
+function resetProgress(){
+  if(!confirm('重置 '+currentMode+' 的进度?')) return;
+  progress[currentMode]=0;
+  currentIndex=0;
+  saveProgress();
+  loadPrompt(0);
+}
+
+function saveProgress(){
+  try{localStorage.setItem('sf_progress',JSON.stringify(progress));}catch(e){}
+}
+
+function generateAIPrompt(){
+  document.getElementById('promptText').textContent='正在生成...';
+  document.getElementById('promptChinese').textContent='';
+  document.getElementById('promptPhonetic').textContent='';
+  document.getElementById('promptSub').textContent='';
+
+  var modeDescriptions={
+    sentences:'一个用于日常对话或专业场景的自然英语句子',
+    tongue:'一个包含刻意重复难发音模式的真正绕口令——必须连母语者快速朗读都会被绕到。同一难发音必须重复4次以上',
+    vocab:'一串3-5个按主题相关的常读错英语单词，用逗号分隔——仅限独立单词，绝对不要完整句子。示例："comfortable, vegetable, temperature, chocolate"',
+    free:'一个开放式问题或话题提示，用于自由口语练习'
+  };
+
+  var levelHint=currentDiff==='all'?'intermediate':currentDiff;
+
+  var isVocab=currentMode==='vocab';
+  var isTongue=currentMode==='tongue';
+
+  var vocabSection=isVocab
+? "重要提示：词汇模式下，只输出用逗号分隔的独立单词——绝对不要输出完整句子。\n正确示例：\"comfortable, vegetable, temperature, chocolate\"\n错误示例：\"I need to buy some vegetables and chocolate.\" <-- 严禁此类输出。\n"
+: "";
+
+  var tongueSection=isTongue
+? "重要提示：这是绕口令。必须有重复出现的相似发音，使快速朗读时真正绕口。同一辅音或发音模式必须在句中密集出现4次以上。参考：\"She sells seashells by the seashore\" 或 \"Peter Piper picked a peck of pickled peppers.\" 如果连母语者3倍速朗读都不会打结，就不算绕口令——请重写。\n\n重要——多样性：每个绕口令必须针对与其他绕口令完全不同的发音。轮换使用：/p/ vs /b/、/s/ vs /ʃ/、/r/ vs /l/、/θ/ vs /ð/、/v/ vs /w/、/tʃ/ vs /dʒ/、辅音簇（str, spr, spl）、多音节快速连读、元音区分。绝不要生成两个针对相同发音模式的绕口令。\n"
+: "";
+
+  var requirementsSection=isVocab
+? "1. 格式\n- 只输出逗号分隔的独立单词\n- 每个单词3个音节以上，是常见的易读错词\n- 按主题分组（如：食物、商务、科学、情感）\n- \"text\" 字段只需逗号连接的单词，不要有任何句子结构\n\n2. 中文翻译\n- \"chinese\" 字段给出这些单词的地道中文对应，切忌生硬直译，要用自然的汉语表达\n"
+: "1. 自然度\n- 例句必须像母语者在真实生活中会说的话\n- 避免教科书式或千篇一律的句子\n\n2. 长度与节奏\n- 10-18个词\n- 必须具有自然的节奏和重音模式（不能平铺直叙或生硬）\n\n3. 发音重点（非常重要）\n- 必须包含以下至少两项：\n  * \"th\" 音（think, this, though）\n  * \"r\" vs \"l\"\n  * 辅音簇（如 \"str\", \"pl\", \"dr\"）\n  * 词语间的连读\n  * 重音变化（重要音节）\n- 难度应明显但不过分\n\n4. 含义\n- 句子应稍有趣味、有情感或有场景感\n- 避免如 \"I go to school\" 这种枯燥的句子\n\n5. 多样性\n- 不要重复常见的模式\n- 让每个句子都感觉独特且真实\n\n6. 中文翻译\n- \"chinese\" 字段必须是用地道汉语对例句的意译，拒绝逐词硬翻，读起来要像中国人日常说的话\n";
+
+  var formatExampleText=isVocab?'"word1, word2, word3"':'"..."';
+  var formatExamplePhonetic=isVocab?'"每个词的IPA音标，逗号分隔"':'"..."';
+
+  var selfCheckSection=isVocab
+? "- 你是否只输出了独立单词？如果输出了完整句子，即为失败。\n- 单词是否按明确主题分组？\n- 是否有3-5个单词？\n"
+: (isTongue
+  ? "- 这个句子是否真正绕口？如果3倍速朗读不会打结，请重写。\n- 同一难发音是否出现了4次以上？\n- 母语者真的会这样说吗？如果不会，请重写。\n- 是否包含至少两种发音挑战？如果没有，请重写。\n- 是否比基础教科书句子更有趣？如果没有，请重写。\n"
+  : "- 母语者真的会这样说吗？如果不会，请重写。\n- 是否包含至少两种发音挑战？如果没有，请重写。\n- 是否比基础教科书句子更有趣？如果没有，请重写。\n");
+
+  var prompt = "你是一位顶级的英语发音教练和内容设计师。\n\n"+
+"请为一名"+levelHint+"水平的学习者，创建一道高质量的英语口语练习题目。\n"+
+"题型："+modeDescriptions[currentMode]+"\n\n"+
+vocabSection+
+tongueSection+
+"这不应是随机的题目，它必须像是精心设计过的练习素材。\n\n"+
+"严格要求：\n\n"+
+requirementsSection+
+"---\n\n"+
+"输出规则（关键）：\n\n"+
+"只返回有效的JSON。\n"+
+"不要解释、不要markdown、不要额外文字。\n\n"+
+"格式：\n"+
+"{\n"+
+"  \"text\": "+formatExampleText+",\n"+
+"  \"chinese\": \"地道自然的中文翻译，切忌逐词硬译，要符合汉语口语习惯\",\n"+
+"  \"phonetic\": "+formatExamplePhonetic+",\n"+
+"  \"sub\": \"一句针对最难发音部分的中文精准提示\"\n"+
+"}\n\n"+
+"---\n\n"+
+"输出前自查：\n\n"+
+selfCheckSection+
+"只有当所有条件都满足时才输出。";
+
+  fetchTimeout('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      messages:[{role:'user',content:prompt}]
+    })
+  }).then(function(res){return res.json()}).then(function(data){
+    var raw = (data&&data.content&&data.content[0]&&data.content[0].text) || '';
+    console.log("AI RAW:", raw);
+    var parsed = null;
+    try{
+      parsed = JSON.parse(raw);
+    }catch(e){
+      var match = raw.match(/\{[\s\S]*\}/);
+      if(match){
+        try{ parsed = JSON.parse(match[0]); }catch(e){}
+      }
+    }
+    if(parsed && parsed.text){
+      document.getElementById('promptText').textContent = parsed.text;
+      document.getElementById('promptChinese').textContent = parsed.chinese || '';
+      document.getElementById('promptPhonetic').textContent = parsed.phonetic || '';
+      document.getElementById('promptSub').textContent = parsed.sub || '';
+    } else {
+      document.getElementById('promptText').textContent = raw || '请重试';
+    }
+  }).catch(function(e){
+    console.error(e);
+    var arr=getFilteredPrompts();
+    var p=arr[currentIndex%arr.length];
+    document.getElementById('promptText').textContent=p.text;
+    document.getElementById('promptChinese').textContent=p.chinese||'';
+    document.getElementById('promptPhonetic').textContent=p.phonetic;
+    document.getElementById('promptSub').textContent=p.sub;
+  });
+  updateProgressBar();
+}
+
+function loadNextPrompt(){
+  var arr=getFilteredPrompts();
+  var total=arr.length;
+  currentIndex++;
+  if(currentIndex>=total){
+    currentIndex=0;
+    progress[currentMode]=0;
+    saveProgress();
+    resetRecording();
+    replenishFromAI(total);
+  } else {
+    progress[currentMode]=Math.max(progress[currentMode]||0,currentIndex);
+    saveProgress();
+    resetRecording();
+    generateAIPrompt();
+  }
+}
+
+function hideResults(){
+  document.getElementById('resultsCard').classList.remove('visible');
+  document.getElementById('feedbackSection').classList.remove('visible');
+}
+
+function resetRecording(){
+  transcript='';
+  document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">你的语音将在这里实时显示...</span>';
+  document.getElementById('analyzeBtn').classList.remove('visible');
+  hideResults();
+  if(isRecording) stopRecording();
+}
+
+function speakPrompt(){
+  if(!synth){showTTSWarning();return}
+  var text=document.getElementById('promptText').textContent;
+  if(!text||text==='正在生成...'||text==='正在生成新题目...') return;
+  speakText(text,'en-GB');
+}
+
+function speakText(text,lang,rate){
+  if(!synth){showTTSWarning();return}
+  if(currentUtterance){synth.cancel();currentUtterance=null}
+  if(voices.length===0){
+    voices=synth.getVoices();
+    if(voices.length===0){
+      setTimeout(function(){
+        var v=synth.getVoices();
+        if(v.length>0) voices=v;
+      },300);
+    }
+  }
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang=lang||'en-US';
+  u.rate=rate||0.92;
+  u.pitch=1.05;
+  if(voices.length>0){
+    var chosen=null;
+    for(var i=0;i<voices.length;i++){
+      if(voices[i].lang.startsWith('en')&&voices[i].name.indexOf('Google')>-1){chosen=voices[i];break}
+    }
+    if(!chosen){
+      for(var i=0;i<voices.length;i++){
+        if(voices[i].lang.startsWith('en')&&voices[i].localService===true){chosen=voices[i];break}
+      }
+    }
+    if(!chosen){
+      for(var i=0;i<voices.length;i++){
+        if(voices[i].lang.startsWith('en')){chosen=voices[i];break}
+      }
+    }
+    if(chosen) u.voice=chosen;
+  }
+  currentUtterance=u;
+  u.onstart=function(){ttsAvailable=true;ttsTested=true};
+  u.onend=function(){currentUtterance=null;var btn=document.getElementById('playFeedbackBtn');if(btn){btn.classList.remove('playing');btn.textContent='▶'}};
+  u.onerror=function(e){currentUtterance=null;ttsTested=true;console.log('TTS error:',e.error);if(e.error==='not-allowed'||e.error==='synthesis-unavailable'||e.error==='synthesis-failed'){ttsAvailable=false;showTTSWarning()}};
+  try{synth.resume();synth.speak(u)}catch(e){console.log('TTS speak failed:',e);showTTSWarning()}
+  // 检测TTS是否静默失败
+  if(!ttsTested){
+    setTimeout(function(){
+      if(!ttsAvailable){
+        try{if(!synth.speaking){ttsTested=true;ttsAvailable=false;showTTSWarning()}}catch(e){}
+      }
+    },800);
+  }
+}
+
+function showTTSWarning(){
+  if(document.getElementById('ttsWarning')) return;
+  var w=document.createElement('div');
+  w.id='ttsWarning';
+  w.style.cssText='text-align:center;font-size:12px;color:#C0392B;padding:8px;margin:0;background:rgba(192,57,43,0.06);border-radius:8px;margin-top:0.5rem';
+  w.textContent='当前浏览器不支持语音朗读（试听），但不影响录音自评练习';
+  var s=document.getElementById('micStatus');
+  if(s&&!document.getElementById('ttsWarning')) s.parentNode.insertBefore(w,s);
+}
+
+if(synth){
+  synth.onvoiceschanged=function(){voices=synth.getVoices()};
+  voices=synth.getVoices();
+  if(voices.length===0){
+    setTimeout(function(){voices=synth.getVoices()},500);
+    setTimeout(function(){if(voices.length===0) voices=synth.getVoices()},1500);
+  }
+}
+
+function toggleRecording(){
+  if(isRecording) stopRecording();
+  else startRecording();
+}
+
+function startRecording(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    document.getElementById('noSupport').style.display='block';
+    document.getElementById('micStatus').textContent='浏览器不支持麦克风录音';
+    return;
+  }
+  var mimeType=getSupportedMimeType();
+  if(!speechAPI){
+    // 无语音识别API：仅录音模式，用户可回放自评
+    document.getElementById('noSupport').style.display='block';
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    try{
+      mediaRecorder=new MediaRecorder(stream,{mimeType:mimeType});
+    }catch(e){
+      mediaRecorder=new MediaRecorder(stream);
+    }
+    audioChunks=[];
+    mediaRecorder.ondataavailable=function(e){audioChunks.push(e.data)};
+    mediaRecorder.onstop=function(){
+      var blobMime=mimeType||(audioChunks[0]?audioChunks[0].type:'audio/mp4');
+      var blob=new Blob(audioChunks,{type:blobMime});
+      window._lastAudioURL=URL.createObjectURL(blob);
+      if(!speechAPI){
+        document.getElementById('micStatus').textContent='已录制 '+formatTime((Date.now()-recordStartTime)/1000)+'，点击🎧回听你的录音';
+        document.getElementById('listenSelfBtn').style.display='flex';
+        document.getElementById('listenSelfBtn').style.margin='0 auto';
+        document.getElementById('hearPromptBtn').style.display='flex';
+        document.getElementById('hearPromptBtn').style.margin='0 auto';
+      }
+    };
+    mediaRecorder.start();
+    if(speechAPI){
+      var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      recognition=new SR();
+      recognition.lang='en-US';
+      recognition.interimResults=true;
+      recognition.continuous=true;
+      recognition.onresult=function(e){
+        var interim='',final='';
+        for(var i=e.resultIndex;i<e.results.length;i++){
+          if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+          else interim+=e.results[i][0].transcript;
+        }
+        transcript+=final;
+        var display=transcript+(interim?' <em style="color:var(--ink-light)">'+interim+'</em>':'');
+        document.getElementById('transcriptBox').innerHTML=display||'<span class="transcript-placeholder">正在聆听...</span>';
+        if(transcript.trim()) document.getElementById('analyzeBtn').classList.add('visible');
+      };
+      recognition.onerror=function(e){
+        var errMsg='';
+        if(e.error==='not-allowed') errMsg='麦克风权限被拒绝，请在浏览器设置中允许访问麦克风';
+        else if(e.error==='no-speech') errMsg='未检测到语音，请对准麦克风说话';
+        else errMsg='语音识别错误：'+e.error;
+        document.getElementById('micStatus').textContent=errMsg;
+        stopRecording();
+      };
+      recognition.onend=function(){if(isRecording&&recognition) try{recognition.start()}catch(e){} };
+      recognition.start();
+    } else {
+      recordStartTime=Date.now();
+      recordTimer=setInterval(function(){
+        var elapsed=(Date.now()-recordStartTime)/1000;
+        document.getElementById('micStatus').textContent='录音中... '+formatTime(elapsed)+'（本浏览器不支持语音识别，可录制后自评）';
+      },500);
+      document.getElementById('transcriptBox').innerHTML='<span class="transcript-placeholder">本浏览器不支持语音转文字，录音后可回放自评</span>';
+    }
+    isRecording=true;
+    document.getElementById('micBtn').className='mic-btn recording';
+    document.getElementById('micBtn').textContent='⏹';
+    document.getElementById('waveform').classList.add('active');
+    if(!speechAPI) document.getElementById('micStatus').textContent='录音中... 0:00';
+  }).catch(function(e){
+    document.getElementById('micStatus').textContent='无法访问麦克风：'+e.message;
+    document.getElementById('noSupport').style.display='block';
+  });
+}
+
+function stopRecording(){
+  if(recognition){try{recognition.stop()}catch(e){};recognition=null}
+  isRecording=false;
+  if(recordTimer){clearInterval(recordTimer);recordTimer=null}
+  if(mediaRecorder&&mediaRecorder.state!=='inactive'){
+    try{mediaRecorder.stop()}catch(e){}
+  }
+  document.getElementById('micBtn').className='mic-btn idle';
+  document.getElementById('micBtn').textContent='🎙';
+  document.getElementById('waveform').classList.remove('active');
+  if(!speechAPI){
+    document.getElementById('micStatus').textContent='已停止录音，点击 ▶ 可回放';
+  } else {
+    document.getElementById('micStatus').textContent='再次点击麦克风重新录音';
+  }
+}
+
+function formatTime(sec){
+  var m=Math.floor(sec/60);
+  var s=Math.floor(sec%60);
+  return m+':'+(s<10?'0':'')+s;
+}
+
+function getSupportedMimeType(){
+  if(typeof MediaRecorder==='undefined') return '';
+  var types=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/wav'];
+  for(var i=0;i<types.length;i++){
+    if(MediaRecorder.isTypeSupported(types[i])) return types[i];
+  }
+  return '';
+}
+
+function analyzeNow(){
+  stopRecording();
+  var target=document.getElementById('promptText').textContent;
+  var spoken=transcript.trim();
+  if(!spoken) return;
+  showAnalysis(target,spoken);
+}
+
+function tokenize(s){return s.toLowerCase().replace(/[^a-z\s']/g,'').split(/\s+/).filter(Boolean)}
+
+function levenshtein(a,b){
+  var m=a.length,n=b.length;
+  var dp=[];
+  for(var i=0;i<=m;i++){dp[i]=[];for(var j=0;j<=n;j++)dp[i][j]=i===0?j:j===0?i:0}
+  for(var i=1;i<=m;i++) for(var j=1;j<=n;j++) dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function scoreWord(target,spoken){
+  if(!spoken) return 'miss';
+  if(target===spoken) return 'ok';
+  var d=levenshtein(target,spoken);
+  var ratio=d/Math.max(target.length,spoken.length);
+  if(ratio<=0.2) return 'ok';
+  if(ratio<=0.45) return 'warn';
+  return 'err';
+}
+
+function alignWords(tWords,sWords){
+  var results=[];
+  var si=0;
+  for(var ti=0;ti<tWords.length;ti++){
+    var tw=tWords[ti];
+    if(si>=sWords.length){results.push({target:tw,spoken:null,status:'miss'});continue}
+    var sw=sWords[si];
+    var st=scoreWord(tw,sw);
+    if(st==='miss'&&si+1<sWords.length){
+      var st2=scoreWord(tw,sWords[si+1]);
+      if(st2!=='miss'){results.push({target:tw,spoken:null,status:'miss'});continue}
+    }
+    results.push({target:tw,spoken:sw,status:st});
+    si++;
+  }
+  return results;
+}
+
+function showAnalysis(target,spoken){
+  var tWords=tokenize(target);
+  var sWords=tokenize(spoken);
+  var alignment=alignWords(tWords,sWords);
+
+  var okCount=alignment.filter(function(w){return w.status==='ok'}).length;
+  var warnCount=alignment.filter(function(w){return w.status==='warn'}).length;
+  var errCount=alignment.filter(function(w){return w.status==='err'}).length;
+  var missCount=alignment.filter(function(w){return w.status==='miss'}).length;
+  var total=tWords.length;
+
+  var accuracy=Math.round((okCount/total)*100);
+  var fluency=Math.min(100,Math.round(100-((errCount*15+missCount*20+warnCount*8))));
+  var overall=Math.round((accuracy*0.5+Math.max(0,fluency)*0.5));
+
+  var scoreClass=function(s){return s>=80?'good':s>=60?'ok':'poor'};
+
+  document.getElementById('scoreRow').innerHTML=
+    '<div class="score-chip"><div class="score-num '+scoreClass(overall)+'">'+overall+'</div><div class="score-label">综合</div></div>'+
+    '<div class="score-chip"><div class="score-num '+scoreClass(accuracy)+'">'+accuracy+'%</div><div class="score-label">准确率</div></div>'+
+    '<div class="score-chip"><div class="score-num '+scoreClass(Math.max(0,fluency))+'">'+Math.max(0,fluency)+'</div><div class="score-label">流利度</div></div>'+
+    '<div class="score-chip"><div class="score-num '+scoreClass(okCount>0?100:0)+'">'+okCount+'/'+total+'</div><div class="score-label">正确词数</div></div>';
+
+  document.getElementById('wordBreakdown').innerHTML=alignment.map(function(w){
+    var cls='word-'+w.status;
+    var disp=w.target;
+    var title=w.spoken?'title="你说的是：'+w.spoken+'"':'';
+    return '<span class="'+cls+'" '+title+'>'+disp+'</span>';
+  }).join(' ');
+
+  var tips=[];
+  alignment.filter(function(w){return w.status==='err'||w.status==='warn'}).forEach(function(w){
+    if(w.spoken){
+      var icon=w.status==='err'?'err':'warn';
+      tips.push({icon:icon,text:'"'+w.target+'" —— 你说的是"'+w.spoken+'"。'+getTip(w.target,w.spoken)});
+    }
+  });
+  if(missCount>0) tips.push({icon:'err',text:missCount+' 个词未被检测到，请说得更清晰并保持适中语速。'});
+
+  document.getElementById('tipsList').innerHTML=tips.map(function(t){
+    return '<li class="tip-item"><div class="tip-icon '+t.icon+'">'+(t.icon==='err'?'!':'~')+'</div><div>'+t.text+'</div></li>';
+  }).join('')||'<li class="tip-item"><div class="tip-icon" style="background:rgba(26,107,60,0.1);color:var(--green)">✓</div><div>太棒了！未检测到明显的发音问题。</div></li>';
+
+  document.getElementById('resultsCard').classList.add('visible');
+
+  generateFeedback(target,spoken,overall,accuracy,fluency,alignment);
+}
+
+function getTip(target,spoken){
+  var pairs=[
+    [['th','the'],['d','de','da'],'/ð/ 音：舌尖轻触上齿，声带振动。'],
+    [['th'],['t','f','s'],'/θ/ 音：舌尖放在上下齿之间，轻轻送气不振动。'],
+    [['sh','she','show'],['s','z'],'/ʃ/ 音：双唇圆拢前推，舌根后缩。'],
+    [['v','very','have'],['b','w'],'/v/ 音：上齿轻触下唇，声带振动。'],
+    [['w','was','were'],['v'],'/w/ 音：双唇充分收圆，不接触牙齿。'],
+  ];
+  for(var i=0;i<pairs.length;i++){
+    var targets=pairs[i][0];
+    var tip=pairs[i][2];
+    if(targets.some(function(t){return target.indexOf(t)>-1})||targets.some(function(t){return spoken.indexOf(t)>-1})) return tip;
+  }
+  var dl=levenshtein(target,spoken);
+  if(dl===1) return '非常接近了！检查一下单词的结尾部分。';
+  return '建议逐音节拆开慢练：'+target.split('').join('-·-').replace(/-·-/g,'')+'。';
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('tabAnalysis').className=tab==='analysis'?'':'section-hidden';
+  document.getElementById('tabTips').className=tab==='tips'?'':'section-hidden';
+}
+
+function generateFeedback(target,spoken,overall,accuracy,fluency,alignment){
+  if(currentMode==='free'){
+    document.getElementById('feedbackSection').classList.add('visible');
+    document.getElementById('aiResponse').innerHTML='';
+    document.getElementById('playFeedbackBtn').style.display='none';
+    document.getElementById('listenSelfBtn').style.display='flex';
+    document.getElementById('hearPromptBtn').style.display='flex';
+    return;
+  }
+  document.getElementById('feedbackSection').classList.add('visible');
+  document.getElementById('aiResponse').innerHTML='<span class="loading-dots">正在生成教练反馈</span>';
+  var errors=alignment.filter(function(w){return w.status==='err'||w.status==='warn'});
+  var errorList=errors.map(function(w){return '"'+w.target+'" 读作了 "'+(w.spoken||'(未识别)')+'"'}).join(', ');
+
+  var prompt='你是一位严厉、高要求的英语发音教练。学员刚刚练习了以下内容：\n\n目标句子："'+target+'"\n学员说的："'+spoken+'"\n综合评分：'+overall+'/100，准确率：'+accuracy+'%，流利度：'+fluency+'/100\n'+(errors.length>0?'问题词汇：'+errorList:'未发现明显错误。')+'\n\n请用中文给出2-3句简短、个人化、针对性的教练反馈。具体指出学员做得好的地方，然后针对最重要的错误给出一个具体建议，和适当的批评，语气要自然严格，最后加一句简短的鼓励。不要使用列表或符号。';
+
+  fetchTimeout('https://bold-recipe-7b74.sjdn2266.workers.dev/',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:200,
+      messages:[{role:'user',content:prompt}]
+    })
+  }).then(function(res){return res.json()}).then(function(data){
+    feedbackText=(data&&data.content&&data.content[0]&&data.content[0].text)||'已经很不错了！坚持练习，每天都会进步。';
+    document.getElementById('aiResponse').textContent=feedbackText;
+  }).catch(function(e){
+    feedbackText=overall>=80?
+      "非常出色！你的发音清晰自然。保持这个势头——持续练习是说好英语的关键！":
+      "不错！你在不断进步。重点练习高亮的词汇，遇到难发的音时放慢速度。每次练习都在强化肌肉记忆——坚持下去！";
+    document.getElementById('aiResponse').textContent=feedbackText;
+  });
+}
+
+function playFeedback(){
+  var btn=document.getElementById('playFeedbackBtn');
+  if(currentUtterance){synth.cancel();currentUtterance=null;btn.classList.remove('playing');btn.textContent='▶';return}
+  if(!feedbackText) return;
+  btn.classList.add('playing');
+  btn.textContent='⏸';
+  speakText(feedbackText,'en-US',0.9);
+}
+
+function playMyRecording(){
+  if(!window._lastAudioURL){
+    alert('没有找到录音，请重新录制');
+    return;
+  }
+  var audio=new Audio(window._lastAudioURL);
+  audio.play();
+}
+
+function tryAgain(){resetRecording()}
+
+if(!speechAPI){
+  document.getElementById('noSupport').style.display='block';
+  document.getElementById('noSupport').textContent='本浏览器不支持语音识别，但你可以使用录音功能录制自己的朗读，然后回放自评。点击麦克风开始录音。';
+}
+if(!synth){
+  showTTSWarning();
+}
+
+currentIndex=progress[currentMode]||0;
+generateAIPrompt();
+if(synth) setTimeout(function(){if(voices.length===0){voices=synth.getVoices()}},1000);
+</script>
+</body>
+</html>
